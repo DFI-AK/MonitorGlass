@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>MonitorGlass.Domain</RootNamespace>
+    <AssemblyName>MonitorGlass.Domain</AssemblyName>
+    <UserSecretsId>681c8b1b-ea62-4b7c-9f41-013cc1490d04</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MediatR" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" />
+  </ItemGroup>
+
+</Project>
