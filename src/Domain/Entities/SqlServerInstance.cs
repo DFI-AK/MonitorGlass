@@ -7,6 +7,6 @@ public class SqlServerInstance : BaseAuditableEntity
     public string? ConnectionString { get; set; }
     public bool IsDefault { get; set; }
     public bool IsConnected { get; set; }
-
     public ICollection<SqlDatabase> Databases { get; set; } = [];
+    public ICollection<SqlServerMetric> SqlServerMetrics { get; set; } = [];
 }

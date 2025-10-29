@@ -185,21 +185,33 @@ internal sealed class SystemProbeService(ILogger<SystemProbeService> logger) : I
 
         try
         {
-            foreach (var drive in DriveInfo.GetDrives().Where(d => d.IsReady))
+            var category = new PerformanceCounterCategory("PhysicalDisk");
+            var instanceNames = category.GetInstanceNames()
+                .Where(n => !string.Equals(n, "_Total", StringComparison.OrdinalIgnoreCase))
+                .ToArray();
+
+            foreach (var instanceName in instanceNames)
             {
-                var driveLetter = drive.Name.TrimEnd('\\');
+                // Match instance (e.g. "0 C:") to actual drive info if possible
+                var driveLetter = instanceName.Split(' ').LastOrDefault()?.TrimEnd(':');
 
-                // Initialize performance counters for disk metrics
-                using var readCounter = new PerformanceCounter("PhysicalDisk", "Disk Read Bytes/sec", "_Total", true);
-                using var writeCounter = new PerformanceCounter("PhysicalDisk", "Disk Write Bytes/sec", "_Total", true);
-                using var iopsCounter = new PerformanceCounter("PhysicalDisk", "Disk Transfers/sec", "_Total", true);
+                DriveInfo? driveInfo = null;
+                if (!string.IsNullOrWhiteSpace(driveLetter))
+                {
+                    driveInfo = DriveInfo.GetDrives()
+                        .FirstOrDefault(d => d.IsReady && d.Name.StartsWith(driveLetter, StringComparison.OrdinalIgnoreCase));
+                }
 
-                // Warm-up counters (first call returns 0)
+                using var readCounter = new PerformanceCounter("PhysicalDisk", "Disk Read Bytes/sec", instanceName, true);
+                using var writeCounter = new PerformanceCounter("PhysicalDisk", "Disk Write Bytes/sec", instanceName, true);
+                using var iopsCounter = new PerformanceCounter("PhysicalDisk", "Disk Transfers/sec", instanceName, true);
+
+                // Warm-up (first call always returns 0)
                 _ = readCounter.NextValue();
                 _ = writeCounter.NextValue();
                 _ = iopsCounter.NextValue();
 
-                Thread.Sleep(1000); // short delay for accurate reading
+                Thread.Sleep(1000); // Small delay to get accurate metrics
 
                 var readBytesPerSec = readCounter.NextValue();
                 var writeBytesPerSec = writeCounter.NextValue();
@@ -207,9 +219,13 @@ internal sealed class SystemProbeService(ILogger<SystemProbeService> logger) : I
 
                 disks.Add(new DiskDetail
                 {
-                    DriveLetter = driveLetter,
-                    DiskTotalSpaceGB = Math.Round(drive.TotalSize / (1024.0 * 1024.0 * 1024.0), 2),
-                    DiskFreeSpaceGB = Math.Round(drive.TotalFreeSpace / (1024.0 * 1024.0 * 1024.0), 2),
+                    DriveLetter = driveInfo?.Name ?? instanceName,
+                    DiskTotalSpaceGB = driveInfo != null
+                        ? Math.Round(driveInfo.TotalSize / (1024.0 * 1024.0 * 1024.0), 2)
+                        : null,
+                    DiskFreeSpaceGB = driveInfo != null
+                        ? Math.Round(driveInfo.TotalFreeSpace / (1024.0 * 1024.0 * 1024.0), 2)
+                        : null,
                     DiskReadSpeedMBps = Math.Round(readBytesPerSec / (1024.0 * 1024.0), 2),
                     DiskWriteSpeedMBps = Math.Round(writeBytesPerSec / (1024.0 * 1024.0), 2),
                     DiskIOPS = Convert.ToInt32(iops)
@@ -218,7 +234,7 @@ internal sealed class SystemProbeService(ILogger<SystemProbeService> logger) : I
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error collecting disk metrics: {ex.Message}");
+            Console.WriteLine($"[DiskMonitor] Error collecting disk metrics: {ex.Message}");
         }
 
         return disks;

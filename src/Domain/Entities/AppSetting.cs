@@ -1,6 +1,6 @@
 namespace MonitorGlass.Domain.Entities;
 
-public class AppSetting : BaseAuditableEntity
+public class AppSetting : BaseEntity<Guid>
 {
     public Guid UserId { get; set; }
     public ApplicationUser User { get; set; } = null!;

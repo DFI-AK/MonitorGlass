@@ -1,6 +1,6 @@
 namespace MonitorGlass.Domain.Entities;
 
-public class SystemHealth : BaseAuditableEntity
+public class SystemHealth : BaseEntity<Guid>, IAuditableEntity
 {
     public Guid SystemInfoId { get; set; }
     public SystemInfo SystemInfo { get; set; } = null!;
@@ -8,4 +8,6 @@ public class SystemHealth : BaseAuditableEntity
     public long UptimeMinutes { get; set; }
     public string? HealthStatus { get; set; }
     public string? ErrorMessage { get; set; }
+    public DateTimeOffset Created { get; set; }
+    public DateTimeOffset LastModified { get; set; }
 }

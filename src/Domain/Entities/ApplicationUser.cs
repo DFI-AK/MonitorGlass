@@ -5,9 +5,7 @@ namespace MonitorGlass.Domain.Entities;
 
 public class ApplicationUser : IdentityUser<Guid>, IAuditableEntity, IDomainEvent
 {
-    public string? FirstName { get; set; }
-
-    public string? LastName { get; set; }
+    public string? DisplayName { get; set; }
 
     public bool IsActive { get; set; }
 

@@ -1,0 +1,44 @@
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
+using MonitorGlass.Application.Common.Models;
+using MonitorGlass.Application.Windows.Commands.DeleteServer;
+using MonitorGlass.Application.Windows.Commands.AddServer;
+
+namespace MonitorGlass.Web.Endpoints;
+
+public class Windows : EndpointGroupBase
+{
+    public override void Map(RouteGroupBuilder groupBuilder)
+    {
+        groupBuilder.MapPost(AddServer, nameof(AddServer).ToLower())
+        .WithSummary("Add new server")
+        .WithDescription("Adds a new server to be monitored.")
+        .Produces<Result>(StatusCodes.Status201Created)
+        .Produces<ProblemDetails>(StatusCodes.Status400BadRequest)
+        .WithOpenApi();
+
+        groupBuilder.MapDelete(DeleteServer, nameof(DeleteServer).ToLower())
+        .WithSummary("Delete server")
+        .WithDescription("Delete the server from the application, but it won't delete the historical data.")
+        .Produces<Result>()
+        .Produces<ProblemDetails>(StatusCodes.Status400BadRequest)
+        .Produces<Result>(StatusCodes.Status400BadRequest)
+        .WithOpenApi();
+    }
+
+    async Task<Results<Created<Result>, BadRequest>> AddServer(ISender sender, AddServerCommand command)
+    {
+        var response = await sender.Send(command);
+        return response.Succeeded
+        ? TypedResults.Created(string.Empty, response)
+        : TypedResults.BadRequest();
+    }
+
+    async Task<Results<Ok<Result>, BadRequest<Result>, BadRequest>> DeleteServer(ISender sender, Guid serverId)
+    {
+        var response = await sender.Send(new DeleteServerCommand(serverId));
+        return response.Succeeded
+        ? TypedResults.Ok(response)
+        : TypedResults.BadRequest(response);
+    }
+}

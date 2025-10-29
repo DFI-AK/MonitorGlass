@@ -1,6 +1,6 @@
 ﻿using MonitorGlass.Application.Common.Interfaces;
 
-namespace MonitorGlass.Application.SystemInformation.Commands.AddServer;
+namespace MonitorGlass.Application.Windows.Commands.AddServer;
 
 public record AddServerCommand : IRequest<Result>
 {
@@ -10,21 +10,7 @@ public record AddServerCommand : IRequest<Result>
     public string? Password { get; init; }
 }
 
-public class AddServerCommandValidator : AbstractValidator<AddServerCommand>
-{
-    public AddServerCommandValidator()
-    {
-        RuleFor(v => v.ServerName)
-            .NotEmpty().WithMessage("Server name is required.")
-            .MaximumLength(100).WithMessage("Server name must not exceed 100 characters.");
-
-        RuleFor(v => v.ServerName)
-        .Matches(@"^[a-zA-Z0-9\-\.]+$")
-        .WithMessage("Server name contains invalid characters.");
-    }
-}
-
-public class AddServerCommandHandler(ISystemInformationRepository repository, ISystemProbeService probeService) : IRequestHandler<AddServerCommand, Result>
+internal sealed class AddServerCommandHandler(ISystemInformationRepository repository, ISystemProbeService probeService) : IRequestHandler<AddServerCommand, Result>
 {
     private readonly ISystemInformationRepository _repository = repository;
     private readonly ISystemProbeService _probeService = probeService;

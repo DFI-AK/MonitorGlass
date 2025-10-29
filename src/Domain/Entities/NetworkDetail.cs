@@ -1,6 +1,6 @@
 namespace MonitorGlass.Domain.Entities;
 
-public class NetworkDetail : BaseAuditableEntity
+public class NetworkDetail : BaseEntity<Guid>, IAuditableEntity
 {
     public Guid SystemMetricId { get; set; }
     public SystemMetric SystemMetric { get; set; } = null!;
@@ -13,4 +13,6 @@ public class NetworkDetail : BaseAuditableEntity
     public long SpeedMbps { get; set; }
     public long BytesSent { get; set; }
     public long BytesReceived { get; set; }
+    public DateTimeOffset Created { get; set; }
+    public DateTimeOffset LastModified { get; set; }
 }

@@ -28,6 +28,10 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
 
     public DbSet<DatabaseMigrationHistory> DatabaseMigrationHistory => Set<DatabaseMigrationHistory>();
 
+    public DbSet<SqlServerMetric> SqlServerMetrics => Set<SqlServerMetric>();
+
+    public DbSet<SqlDatabaseMetric> SqlDatabaseMetrics => Set<SqlDatabaseMetric>();
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);

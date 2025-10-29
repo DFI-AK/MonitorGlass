@@ -9,4 +9,5 @@ public class SqlDatabase : BaseAuditableEntity
     public bool IsSystemDatabase { get; set; }
     public Guid SqlServerInstanceId { get; set; }
     public SqlServerInstance SqlServerInstance { get; set; } = null!;
+    public ICollection<SqlDatabaseMetric> SqlDatabaseMetrics { get; set; } = [];
 }

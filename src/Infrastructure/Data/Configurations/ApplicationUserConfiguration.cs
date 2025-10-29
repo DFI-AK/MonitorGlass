@@ -7,6 +7,6 @@ internal sealed class ApplicationUserConfiguration : IEntityTypeConfiguration<Ap
 {
     public void Configure(Microsoft.EntityFrameworkCore.Metadata.Builders.EntityTypeBuilder<ApplicationUser> builder)
     {
-        builder.Property(x => x.FirstName).IsRequired().HasMaxLength(50);
+        builder.Property(x => x.DisplayName).IsRequired().HasMaxLength(50);
     }
 }

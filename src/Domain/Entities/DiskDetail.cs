@@ -1,6 +1,6 @@
 namespace MonitorGlass.Domain.Entities;
 
-public class DiskDetail : BaseAuditableEntity
+public class DiskDetail : BaseEntity<Guid>, IAuditableEntity
 {
     public Guid SystemMetricId { get; set; }
     public SystemMetric SystemMetric { get; set; } = null!;
@@ -10,4 +10,6 @@ public class DiskDetail : BaseAuditableEntity
     public int? DiskIOPS { get; set; }
     public double? DiskFreeSpaceGB { get; set; }
     public double? DiskTotalSpaceGB { get; set; }
+    public DateTimeOffset Created { get; set; }
+    public DateTimeOffset LastModified { get; set; }
 }

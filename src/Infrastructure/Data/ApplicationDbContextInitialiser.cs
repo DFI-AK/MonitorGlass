@@ -110,8 +110,7 @@ public class ApplicationDbContextInitialiser
             UserName = "ayush@localhost",
             Email = "ayush@localhost",
             EmailConfirmed = true,
-            FirstName = "Ayush",
-            LastName = "Kumar"
+            DisplayName = "Ayush Kumar",
         };
 
         try

@@ -5,6 +5,8 @@ using MonitorGlass.Web.Services;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
 using Serilog.Events;
+using NSwag;
+using NSwag.Generation.Processors.Security;
 
 
 namespace Microsoft.Extensions.DependencyInjection;
@@ -34,9 +36,25 @@ public static class DependencyInjection
         builder.Services.AddEndpointsApiExplorer();
 
         builder.Services.AddOpenApiDocument((configure, sp) =>
-        {
-            configure.Title = "MonitorGlass API";
-        });
+         {
+             configure.Title = "MonitorGlass API";
+             var scope = sp.CreateAsyncScope();
+             var provider = scope.ServiceProvider;
+             var environment = provider.GetRequiredService<IWebHostEnvironment>();
+
+             if (environment.IsDevelopment())
+             {
+                 configure.AddSecurity("JWT", Enumerable.Empty<string>(), new OpenApiSecurityScheme
+                 {
+                     Type = OpenApiSecuritySchemeType.ApiKey,
+                     Name = "Authorization",
+                     In = OpenApiSecurityApiKeyLocation.Header,
+                     Description = "Type into the textbox: Bearer {your JWT token}."
+                 });
+
+                 configure.OperationProcessors.Add(new AspNetCoreOperationSecurityScopeProcessor("JWT"));
+             }
+         });
 
         builder.Services.AddSerilog((sp, opt) =>
         {
@@ -48,6 +66,9 @@ public static class DependencyInjection
             opt.MinimumLevel.Override("Microsoft.Hosting.Lifetime", LogEventLevel.Information);
             opt.MinimumLevel.Override("Microsoft.AspNetCore.SpaProxy", LogEventLevel.Information);
 
+            opt.Enrich.WithProperty("MonitorGlass", null, true)
+            .Filter.ByExcluding(x => x.Level == LogEventLevel.Information);
+
             if (environment.IsDevelopment())
             {
                 opt.WriteTo.Console();
@@ -55,6 +76,8 @@ public static class DependencyInjection
             else
             {
                 var path = Path.Combine(AppContext.BaseDirectory, "logs", "log-.txt");
+
+
                 opt.WriteTo.File(path, rollingInterval: RollingInterval.Day);
             }
         });
