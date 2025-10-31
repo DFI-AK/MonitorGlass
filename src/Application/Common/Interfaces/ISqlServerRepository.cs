@@ -14,4 +14,8 @@ public interface ISqlServerRepository
     // Metrics
     Task AddInstanceMetricsAsync(SqlServerMetric metric, CancellationToken cancellationToken = default);
     Task AddDatabaseMetricsAsync(SqlDatabaseMetric metric, CancellationToken cancellationToken = default);
+
+    Task<bool> IsInstanceExistAsync(string instanceName, CancellationToken cancellationToken);
+
+    Task<Result> DeleteAsync(Guid instanceId, CancellationToken cancellationToken = default);
 }

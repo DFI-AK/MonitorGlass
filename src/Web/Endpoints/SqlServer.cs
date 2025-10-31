@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using MonitorGlass.Application.Common.Models;
 using MonitorGlass.Application.SqlServer.Commands.AddNewSqlServer;
+using MonitorGlass.Application.SqlServer.Commands.DeleteSqlInstance;
 using MonitorGlass.Application.SqlServer.Queries.GetSqlServers;
 
 namespace MonitorGlass.Web.Endpoints;
@@ -27,6 +28,14 @@ public class SqlServer : EndpointGroupBase
         .Produces<SqlServerLookup>()
         .Produces<ProblemDetails>(StatusCodes.Status400BadRequest)
         .WithOpenApi();
+
+        groupBuilder.MapDelete(DeleteInstance, nameof(DeleteInstance).ToLower())
+        .RequireAuthorization()
+        .WithSummary("Delete instance")
+        .WithDescription("Delete the SQL server instance from the applicationm, if user have the valid permission to delete it.")
+        .Produces<Result>()
+        .Produces<ProblemDetails>(StatusCodes.Status404NotFound)
+        .WithOpenApi();
     }
 
     async Task<Results<Created<SqlServerDto>, BadRequest>> AddNewSqlServer(ISender sender, AddNewSqlServerCommand command)
@@ -43,6 +52,14 @@ public class SqlServer : EndpointGroupBase
         return lookup is null
         ? TypedResults.BadRequest()
         : TypedResults.Ok(lookup);
+    }
+
+    async Task<Results<Ok<Result>, NotFound>> DeleteInstance(ISender sender, Guid instanceId)
+    {
+        var response = await sender.Send(new DeleteSqlInstanceCommand(instanceId));
+        return response.Succeeded
+        ? TypedResults.Ok(response)
+        : TypedResults.NotFound();
     }
 
 }

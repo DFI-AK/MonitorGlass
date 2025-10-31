@@ -1,9 +1,7 @@
 ﻿using System.Data.Common;
 using MonitorGlass.Infrastructure.Data;
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
-using Microsoft.Extensions.Configuration;
 using Npgsql;
 using Respawn;
 using Testcontainers.PostgreSql;

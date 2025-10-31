@@ -6,15 +6,15 @@ using MonitorGlass.Infrastructure.Data;
 
 namespace MonitorGlass.Infrastructure.Repository;
 
-internal sealed class SystemInformationRepository(ILogger<SystemInformationRepository> logger, ApplicationDbContext context) : ISystemInformationRepository
+internal sealed class WindowsRepository(ILogger<WindowsRepository> logger, ApplicationDbContext context) : IWindowsRepository
 {
-    private readonly ILogger<SystemInformationRepository> _logger = logger;
+    private readonly ILogger<WindowsRepository> _logger = logger;
     private readonly ApplicationDbContext _context = context;
 
-    public async Task<SystemInfo?> CreateSystemInfoAsync(SystemInfo systemInfo, CancellationToken cancellationToken = default)
+    public async Task<WindowsServer?> CreateSystemInfoAsync(WindowsServer systemInfo, CancellationToken cancellationToken = default)
     {
         _logger.LogInformation("Creating new SystemInfo with ID: {SystemInfoId}", systemInfo.Id);
-        await _context.SystemInformations.AddAsync(systemInfo, cancellationToken);
+        await _context.Windows.AddAsync(systemInfo, cancellationToken);
         await _context.SaveChangesAsync(cancellationToken);
         _logger.LogInformation("Successfully created SystemInfo with ID: {SystemInfoId}", systemInfo.Id);
         return systemInfo;
@@ -22,28 +22,28 @@ internal sealed class SystemInformationRepository(ILogger<SystemInformationRepos
 
     public async Task<bool> DeleteSystemInfoAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        var systemInfo = await _context.SystemInformations.FindAsync([id], cancellationToken);
+        var systemInfo = await _context.Windows.FindAsync([id], cancellationToken);
         if (systemInfo == null)
         {
             _logger.LogWarning("SystemInfo with ID: {SystemInfoId} not found", id);
             return false;
         }
 
-        _context.SystemInformations.Remove(systemInfo);
+        _context.Windows.Remove(systemInfo);
         await _context.SaveChangesAsync(cancellationToken);
         _logger.LogInformation("Successfully deleted SystemInfo with ID: {SystemInfoId}", id);
         return true;
     }
 
-    public async Task<IEnumerable<SystemInfo>> GetAllSystemInfosAsync(CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<WindowsServer>> GetAllSystemInfosAsync(CancellationToken cancellationToken = default)
     {
-        var entities = await _context.SystemInformations.AsNoTracking().ToListAsync(cancellationToken);
+        var entities = await _context.Windows.AsNoTracking().ToListAsync(cancellationToken);
         return entities;
     }
 
-    public async Task<SystemInfo?> GetSystemInfoByIdAsync(Guid id, CancellationToken cancellationToken = default)
+    public async Task<WindowsServer?> GetSystemInfoByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        var systemInfo = await _context.SystemInformations.FindAsync([id], cancellationToken);
+        var systemInfo = await _context.Windows.FindAsync([id], cancellationToken);
         if (systemInfo == null)
         {
             _logger.LogWarning("SystemInfo with ID: {SystemInfoId} not found", id);
@@ -51,16 +51,19 @@ internal sealed class SystemInformationRepository(ILogger<SystemInformationRepos
         return systemInfo;
     }
 
+    public async Task<WindowsServer?> GetSystemInfoByNameAsync(string serverName, CancellationToken cancellationToken = default)
+    => await _context.Windows.FirstOrDefaultAsync(x => !string.IsNullOrEmpty(x.MachineName) && (x.MachineName.ToLower() == serverName.ToLower()), cancellationToken);
+
     public async Task<bool> IsExistAsync(string machineName, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrEmpty(machineName)) throw new ArgumentNullException(nameof(machineName), "Machine name cannot be null or empty.");
-        var entityExists = await _context.SystemInformations.AnyAsync(x => x.MachineName == machineName, cancellationToken);
+        var entityExists = await _context.Windows.AnyAsync(x => x.MachineName == machineName, cancellationToken);
         return entityExists;
     }
 
-    public async Task<SystemInfo?> UpdateSystemInfoAsync(SystemInfo systemInfo, CancellationToken cancellationToken = default)
+    public async Task<WindowsServer?> UpdateSystemInfoAsync(WindowsServer systemInfo, CancellationToken cancellationToken = default)
     {
-        var existingSystemInfo = await _context.SystemInformations.FindAsync([systemInfo.Id], cancellationToken);
+        var existingSystemInfo = await _context.Windows.FindAsync([systemInfo.Id], cancellationToken);
         if (existingSystemInfo == null)
         {
             _logger.LogWarning("SystemInfo with ID: {SystemInfoId} not found", systemInfo.Id);

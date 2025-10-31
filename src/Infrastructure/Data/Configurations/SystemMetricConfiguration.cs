@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace MonitorGlass.Infrastructure.Data.Configurations;
 
-internal sealed class SystemMetricConfiguration : IEntityTypeConfiguration<SystemMetric>
+internal sealed class SystemMetricConfiguration : IEntityTypeConfiguration<WindowsMetric>
 {
-    public void Configure(EntityTypeBuilder<SystemMetric> builder)
+    public void Configure(EntityTypeBuilder<WindowsMetric> builder)
     {
         builder.Property(x => x.Id).IsRequired().ValueGeneratedOnAdd();
 

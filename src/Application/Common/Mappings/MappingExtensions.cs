@@ -1,6 +1,4 @@
-﻿using MonitorGlass.Application.Common.Models;
-
-namespace MonitorGlass.Application.Common.Mappings;
+﻿namespace MonitorGlass.Application.Common.Mappings;
 
 public static class MappingExtensions
 {

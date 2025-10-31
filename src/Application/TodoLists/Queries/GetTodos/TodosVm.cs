@@ -1,6 +1,4 @@
-﻿using MonitorGlass.Application.Common.Models;
-
-namespace MonitorGlass.Application.TodoLists.Queries.GetTodos;
+﻿namespace MonitorGlass.Application.TodoLists.Queries.GetTodos;
 
 public class TodosVm
 {

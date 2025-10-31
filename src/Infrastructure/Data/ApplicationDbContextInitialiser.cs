@@ -1,6 +1,5 @@
 ﻿using MonitorGlass.Domain.Constants;
 using MonitorGlass.Domain.Entities;
-using MonitorGlass.Infrastructure.Identity;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;

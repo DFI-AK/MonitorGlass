@@ -1,5 +1,4 @@
 ﻿using MonitorGlass.Application.Common.Interfaces;
-using MonitorGlass.Application.Common.Models;
 using MonitorGlass.Application.Common.Security;
 using MonitorGlass.Domain.Enums;
 

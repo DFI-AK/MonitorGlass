@@ -4,9 +4,9 @@ namespace MonitorGlass.Application.Windows.Commands.DeleteServer;
 
 public record DeleteServerCommand(Guid ServerId) : IRequest<Result>;
 
-internal sealed class DeleteServerCommandHandler(ISystemInformationRepository systemInformationRepository) : IRequestHandler<DeleteServerCommand, Result>
+internal sealed class DeleteServerCommandHandler(IWindowsRepository systemInformationRepository) : IRequestHandler<DeleteServerCommand, Result>
 {
-    private readonly ISystemInformationRepository _systemInformationRepository = systemInformationRepository;
+    private readonly IWindowsRepository _systemInformationRepository = systemInformationRepository;
     public async Task<Result> Handle(DeleteServerCommand request, CancellationToken cancellationToken)
     {
         var result = await _systemInformationRepository.DeleteSystemInfoAsync(request.ServerId, cancellationToken);

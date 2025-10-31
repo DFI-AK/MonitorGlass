@@ -9,9 +9,9 @@ using System.Diagnostics;
 namespace MonitorGlass.Infrastructure.Services;
 
 [SupportedOSPlatform("windows")]
-internal sealed class SystemProbeService(ILogger<SystemProbeService> logger) : ISystemProbeService
+internal sealed class WindowsProbeService(ILogger<WindowsProbeService> logger) : IWindowsProbeService
 {
-    private readonly ILogger<SystemProbeService> _logger = logger;
+    private readonly ILogger<WindowsProbeService> _logger = logger;
     public async Task<bool> CheckServerAvailabilityAsync(string hostName, CancellationToken cancellationToken = default)
     {
         _logger.LogInformation("Checking availability for host: {HostName}", hostName);
@@ -39,7 +39,7 @@ internal sealed class SystemProbeService(ILogger<SystemProbeService> logger) : I
         }
     }
 
-    public async Task<SystemMetric> CollectSystemMetricsAsync(string hostName, CancellationToken cancellationToken = default)
+    public async Task<WindowsMetric> CollectSystemMetricsAsync(string hostName, CancellationToken cancellationToken = default)
     {
         _logger.LogInformation("Collecting system metrics for {MachineName}", hostName);
 
@@ -50,7 +50,7 @@ internal sealed class SystemProbeService(ILogger<SystemProbeService> logger) : I
             var diskDetails = GetDiskDetails();
             var networkDetails = GetNetworkDetails();
 
-            var metric = new SystemMetric
+            var metric = new WindowsMetric
             {
                 Id = Guid.CreateVersion7(DateTimeOffset.UtcNow),
                 SystemInfoId = Guid.Empty, // Will be set by service/handler before saving

@@ -3,7 +3,7 @@ namespace MonitorGlass.Domain.Entities;
 public class SystemHealth : BaseEntity<Guid>, IAuditableEntity
 {
     public Guid SystemInfoId { get; set; }
-    public SystemInfo SystemInfo { get; set; } = null!;
+    public WindowsServer SystemInfo { get; set; } = null!;
     public bool IsOnline { get; set; } = true;
     public long UptimeMinutes { get; set; }
     public string? HealthStatus { get; set; }

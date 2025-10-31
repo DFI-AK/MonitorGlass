@@ -5,6 +5,7 @@ using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using MonitorGlass.Domain.Entities;
 
 namespace MonitorGlass.Application.FunctionalTests;
 
@@ -48,7 +49,7 @@ public partial class Testing
     {
         return _userId;
     }
-    
+
     public static List<string>? GetRoles()
     {
         return _roles;
@@ -88,8 +89,8 @@ public partial class Testing
 
         if (result.Succeeded)
         {
-            _userId = user.Id;
-            _roles = roles.ToList();
+            _userId = user.Id.ToString();
+            _roles = [.. roles];
             return _userId;
         }
 
@@ -104,7 +105,7 @@ public partial class Testing
         {
             await _database.ResetAsync();
         }
-        catch (Exception) 
+        catch (Exception)
         {
         }
 

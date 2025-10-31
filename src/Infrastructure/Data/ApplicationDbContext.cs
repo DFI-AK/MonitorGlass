@@ -12,9 +12,9 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
 
     public DbSet<TodoItem> TodoItems => Set<TodoItem>();
 
-    public DbSet<SystemInfo> SystemInformations => Set<SystemInfo>();
+    public DbSet<WindowsServer> Windows => Set<WindowsServer>();
 
-    public DbSet<SystemMetric> SystemMetrics => Set<SystemMetric>();
+    public DbSet<WindowsMetric> WindowsMetrics => Set<WindowsMetric>();
 
     public DbSet<SqlServerInstance> SqlServerInstances => Set<SqlServerInstance>();
 

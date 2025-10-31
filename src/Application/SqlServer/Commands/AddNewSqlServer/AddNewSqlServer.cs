@@ -1,4 +1,5 @@
-﻿using Microsoft.Data.SqlClient;
+﻿using System.Text.RegularExpressions;
+using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
 using MonitorGlass.Application.Common.Interfaces;
 using MonitorGlass.Domain.Entities;
@@ -6,21 +7,45 @@ using MonitorGlass.Domain.Entities;
 
 namespace MonitorGlass.Application.SqlServer.Commands.AddNewSqlServer;
 
-public record AddNewSqlServerCommand(string InstanceName) : IRequest<SqlServerDto>;
+public record AddNewSqlServerCommand : SqlServerDto, IRequest<SqlServerDto?>;
 
-internal class AddNewSqlServerCommandHandler(ISqlServerRepository repository, ISqlConnectionValidatorService service, ILogger<AddNewSqlServerCommandHandler> logger, IMapper mapper) : IRequestHandler<AddNewSqlServerCommand, SqlServerDto>
+internal sealed partial class AddNewSqlServerCommandHandler(ISqlServerRepository repository, ISqlConnectionValidatorService service, ILogger<AddNewSqlServerCommandHandler> logger, IMapper mapper, IWindowsRepository windowsRepository) : IRequestHandler<AddNewSqlServerCommand, SqlServerDto?>
 {
     private readonly ISqlServerRepository _repository = repository;
     private readonly ISqlConnectionValidatorService _service = service;
     private readonly ILogger<AddNewSqlServerCommandHandler> _logger = logger;
     private readonly IMapper _mapper = mapper;
+    private readonly IWindowsRepository _windowsRepository = windowsRepository;
 
-    public async Task<SqlServerDto> Handle(AddNewSqlServerCommand request, CancellationToken cancellationToken)
+    public async Task<SqlServerDto?> Handle(AddNewSqlServerCommand request, CancellationToken cancellationToken)
     {
         if (string.IsNullOrEmpty(request.InstanceName)) throw new InvalidOperationException("Instance name is required");
+
+        var input = request.InstanceName.Trim();
+
+        // Matches optional protocol (tcp:), machine name or IP, optional instance (\something), and optional port (,number)
+        var match = SqlServerFilter().Match(input);
+
+        if (!match.Success)
+        {
+            return null;
+        }
+
+        var machineName = match.Groups["machine"].Value;
+        var instanceName = match.Groups["instance"].Success ? match.Groups["instance"].Value : null;
+        var port = match.Groups["port"].Success ? int.Parse(match.Groups["port"].Value) : (int?)null;
+
+
+        var windowsServer = await _windowsRepository.GetSystemInfoByNameAsync(machineName, cancellationToken)
+            ?? throw new KeyNotFoundException($"Windows server with this name '{machineName}' not found. Please add windows server first.");
+
+        var isExist = await _repository.IsInstanceExistAsync(instanceName ?? machineName, cancellationToken);
+
+        if (isExist) throw new InvalidOperationException($"Instance with this name '{instanceName ?? machineName}' is already added.");
+
         var sqlConnectionBuilder = new SqlConnectionStringBuilder()
         {
-            DataSource = request.InstanceName,
+            DataSource = instanceName ?? machineName,
             ConnectTimeout = 30,
             InitialCatalog = "master",
             IntegratedSecurity = true,
@@ -41,6 +66,7 @@ internal class AddNewSqlServerCommandHandler(ISqlServerRepository repository, IS
             ConnectionString = connectionString,
             IsConnected = true,
             IsDefault = false,
+            ServerId = windowsServer.Id
         };
 
         await _repository.AddInstanceAsync(newInstance, cancellationToken);
@@ -49,4 +75,7 @@ internal class AddNewSqlServerCommandHandler(ISqlServerRepository repository, IS
 
         return _mapper.Map<SqlServerDto>(newInstance);
     }
+
+    [GeneratedRegex(@"^(?:tcp:)?(?<machine>[^\\,]+)(?:\\(?<instance>[^,]+))?(?:,(?<port>\d+))?$", RegexOptions.IgnoreCase, "en-IN")]
+    private static partial Regex SqlServerFilter();
 }

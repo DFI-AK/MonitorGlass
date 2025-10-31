@@ -10,7 +10,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using MonitorGlass.Domain.Entities;
 using Microsoft.AspNetCore.DataProtection;
-using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption.ConfigurationModel;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
@@ -44,22 +43,23 @@ public static class DependencyInjection
 
         builder.Services.AddSingleton(TimeProvider.System);
         builder.Services.AddTransient<IIdentityService, IdentityService>();
-        builder.Services.AddScoped<ISystemInformationRepository, SystemInformationRepository>();
-        builder.Services.AddScoped<ISystemMetricRepository, SystemMetricRepository>();
+        builder.Services.AddScoped<IWindowsRepository, WindowsRepository>();
+        builder.Services.AddScoped<IWindowsMetricRepository, WindowsMetricRepository>();
         builder.Services.AddScoped<ISqlServerRepository, SqlServerRepository>();
         builder.Services.AddScoped<SqlServerRepository>();
         builder.Services.AddScoped<SqlServerMonitoringService>();
         builder.Services.AddScoped<SqlServerInstanceService>();
         builder.Services.AddScoped<ISqlConnectionValidatorService, SqlConnectionValidatorService>();
         builder.Services.AddScoped<EncryptionService>();
+        builder.Services.AddScoped<IEncryptionService, EncryptionService>();
         builder.Services.AddDataProtection()
         .PersistKeysToFileSystem(new(Path.Combine(AppContext.BaseDirectory, "cypherkeys")))
         .SetApplicationName("MonitorGlass");
 
         if (OperatingSystem.IsWindows())
         {
-            builder.Services.AddScoped<ISystemProbeService, SystemProbeService>();
-            builder.Services.AddHostedService<SystemMetricWorker>();
+            builder.Services.AddScoped<IWindowsProbeService, WindowsProbeService>();
+            builder.Services.AddHostedService<WindowsMetricWorker>();
         }
 
         builder.Services.AddAuthentication()

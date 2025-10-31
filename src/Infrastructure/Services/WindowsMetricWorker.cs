@@ -6,12 +6,12 @@ using MonitorGlass.Application.Common.Interfaces;
 
 namespace MonitorGlass.Infrastructure.Services;
 
-internal sealed class SystemMetricWorker(
-    ILogger<SystemMetricWorker> logger,
+internal sealed class WindowsMetricWorker(
+    ILogger<WindowsMetricWorker> logger,
     IServiceScopeFactory scopeFactory)
-    : BackgroundService, ISystemMetricWorker
+    : BackgroundService, IWindowsMetricWorker
 {
-    private readonly ILogger<SystemMetricWorker> _logger = logger;
+    private readonly ILogger<WindowsMetricWorker> _logger = logger;
     private readonly IServiceScopeFactory _scopeFactory = scopeFactory;
 
     public async Task StartCollectMetricsAsync(CancellationToken cancellationToken = default)
@@ -21,10 +21,10 @@ internal sealed class SystemMetricWorker(
         using var scope = _scopeFactory.CreateScope();
         var provider = scope.ServiceProvider;
         var context = provider.GetRequiredService<IApplicationDbContext>();
-        var systemProbeService = provider.GetRequiredService<ISystemProbeService>();
-        var systemRepository = provider.GetRequiredService<ISystemMetricRepository>();
+        var systemProbeService = provider.GetRequiredService<IWindowsProbeService>();
+        var systemRepository = provider.GetRequiredService<IWindowsMetricRepository>();
 
-        var machineNames = await context.SystemInformations
+        var machineNames = await context.Windows
             .Select(si => si.MachineName)
             .Where(m => !string.IsNullOrWhiteSpace(m))
             .ToListAsync(cancellationToken);
@@ -40,7 +40,7 @@ internal sealed class SystemMetricWorker(
             try
             {
                 var metric = await systemProbeService.CollectSystemMetricsAsync(machineName!, cancellationToken);
-                var systemInfo = await context.SystemInformations
+                var systemInfo = await context.Windows
                     .FirstOrDefaultAsync(si => si.MachineName == machineName, cancellationToken);
 
                 if (systemInfo != null)

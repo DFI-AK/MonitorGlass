@@ -10,10 +10,10 @@ public record AddServerCommand : IRequest<Result>
     public string? Password { get; init; }
 }
 
-internal sealed class AddServerCommandHandler(ISystemInformationRepository repository, ISystemProbeService probeService) : IRequestHandler<AddServerCommand, Result>
+internal sealed class AddServerCommandHandler(IWindowsRepository repository, IWindowsProbeService probeService) : IRequestHandler<AddServerCommand, Result>
 {
-    private readonly ISystemInformationRepository _repository = repository;
-    private readonly ISystemProbeService _probeService = probeService;
+    private readonly IWindowsRepository _repository = repository;
+    private readonly IWindowsProbeService _probeService = probeService;
     public async Task<Result> Handle(AddServerCommand request, CancellationToken cancellationToken)
     {
         if (string.IsNullOrEmpty(request.ServerName))
@@ -44,14 +44,13 @@ internal sealed class AddServerCommandHandler(ISystemInformationRepository repos
             operatingSystem = await _probeService.GetLocalOperatingSystemAsync(request.ServerName, cancellationToken);
         }
 
-        var server = new Domain.Entities.SystemInfo
+        var server = new Domain.Entities.WindowsServer
         {
             MachineName = request.ServerName,
             OSVersion = operatingSystem,
         };
 
         var entity = await _repository.CreateSystemInfoAsync(server, cancellationToken);
-        if (entity is null) throw new ApplicationException("Failed to add the server.");
-        return Result.Success();
+        return entity is null ? throw new ApplicationException("Failed to add the server.") : Result.Success();
     }
 }

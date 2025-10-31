@@ -1,6 +1,4 @@
-﻿using MonitorGlass.Application.Common.Models;
-
-namespace MonitorGlass.Application.Common.Interfaces;
+﻿namespace MonitorGlass.Application.Common.Interfaces;
 
 public interface IIdentityService
 {

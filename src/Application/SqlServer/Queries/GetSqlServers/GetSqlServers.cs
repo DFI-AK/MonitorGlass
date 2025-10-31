@@ -12,7 +12,7 @@ internal sealed class GetSqlServersQueryHandler(ISqlServerRepository repository,
     public async Task<SqlServerLookup> Handle(GetSqlServersQuery request, CancellationToken cancellationToken)
     {
         var sqlInstances = await _repository.GetAllAsync(cancellationToken);
-        var sqlServers = _mapper.Map<IReadOnlyList<SqlServerDto>>(sqlInstances);
+        var sqlServers = _mapper.Map<IEnumerable<SqlServerDto>>(sqlInstances);
         var status = Enum.GetValues(typeof(SqlServerStatus))
         .Cast<SqlServerStatus>()
         .Select(x => new SqlServerStatusDto() { Id = (int)x, Status = x.ToString() })

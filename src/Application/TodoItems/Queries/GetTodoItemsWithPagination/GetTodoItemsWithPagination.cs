@@ -1,6 +1,5 @@
 ﻿using MonitorGlass.Application.Common.Interfaces;
 using MonitorGlass.Application.Common.Mappings;
-using MonitorGlass.Application.Common.Models;
 
 namespace MonitorGlass.Application.TodoItems.Queries.GetTodoItemsWithPagination;
 

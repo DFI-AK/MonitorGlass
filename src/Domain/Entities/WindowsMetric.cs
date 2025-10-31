@@ -1,9 +1,9 @@
 namespace MonitorGlass.Domain.Entities;
 
-public class SystemMetric : BaseEntity<Guid>, IAuditableEntity
+public class WindowsMetric : BaseEntity<Guid>, IAuditableEntity
 {
     public Guid SystemInfoId { get; set; }
-    public SystemInfo SystemInfo { get; set; } = null!;
+    public WindowsServer SystemInfo { get; set; } = null!;
     public CpuDetail CpuDetail { get; set; } = null!;
     public MemoryDetail MemoryDetail { get; set; } = null!;
     public ICollection<DiskDetail> DiskDetails { get; set; } = [];
