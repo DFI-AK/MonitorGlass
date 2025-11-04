@@ -1,6 +1,5 @@
 ﻿using System.Reflection;
 using MonitorGlass.Application.Common.Exceptions;
-using MonitorGlass.Application.Common.Interfaces;
 using MonitorGlass.Application.Common.Security;
 
 namespace MonitorGlass.Application.Common.Behaviours;

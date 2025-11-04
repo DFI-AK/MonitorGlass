@@ -695,6 +695,43 @@
           }
         }
       }
+    },
+    "/api/Windows/getwindowsservers": {
+      "get": {
+        "tags": [
+          "Windows"
+        ],
+        "summary": "Windows servers",
+        "description": "Get the windows server.",
+        "operationId": "GetWindowsServers",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WindowsDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
     }
   },
   "components": {
@@ -1067,22 +1104,36 @@
         }
       },
       "AddServerCommand": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/WindowsDto"
+          },
+          {
+            "type": "object",
+            "additionalProperties": false
+          }
+        ]
+      },
+      "WindowsDto": {
         "type": "object",
         "additionalProperties": false,
         "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid",
+            "nullable": true
+          },
           "serverName": {
             "type": "string",
             "nullable": true
           },
-          "isRemoteServer": {
-            "type": "boolean"
-          },
-          "userName": {
+          "os": {
             "type": "string",
             "nullable": true
           },
-          "password": {
+          "created": {
             "type": "string",
+            "format": "date-time",
             "nullable": true
           }
         }

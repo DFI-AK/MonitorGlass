@@ -1,0 +1,70 @@
+<div class="w-full h-full">
+  @if (isLoading()) {
+  <div class="flex justify-center items-center w-full h-full">
+    <p-progress-spinner
+      strokeWidth="4"
+      fill="transparent"
+      animationDuration="0.5"
+      ariaLabel="Loading"
+    />
+  </div>
+  }@else if (windows()) {
+  <div class="grid sm:grid-cols-4">
+    <monitorglass-server-card
+      [server]="windows()"
+      (onDelete)="deleteServer($event)"
+    />
+  </div>
+  } @else {
+  <span class="text-sm text-slate-400"
+    >No servers are added yet, &nbsp;
+    <button
+      type="button"
+      pButton
+      size="small"
+      severity="primary"
+      (click)="op.toggle($event)"
+    >
+      <i class="pi pi-plus" pButtonIcon></i>
+      <span pButtonLabel>Add</span>
+    </button></span
+  >
+
+  <p-popover #op>
+    <ng-template #content>
+      <div class="w-full max-w-2xs p-2">
+        <p-float-label variant="on" class="mb-3">
+          <input
+            type="text"
+            pInputText
+            fluid
+            placeholder="Enter hostname"
+            [(ngModel)]="hostName"
+          />
+          <label for="hostname">Enter hostname</label>
+        </p-float-label>
+        <button
+          type="button"
+          pButton
+          severity="danger"
+          size="small"
+          class="me-2"
+          (click)="op.hide()"
+        >
+          Cancel
+        </button>
+        <button
+          type="button"
+          pButton
+          severity="primary"
+          text
+          size="small"
+          (click)="addServer()"
+        >
+          Add server
+        </button>
+      </div>
+    </ng-template>
+  </p-popover>
+  }
+</div>

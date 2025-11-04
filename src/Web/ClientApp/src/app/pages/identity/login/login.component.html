@@ -1,0 +1,47 @@
+<div class="grid sm:grid-cols-4 grid-cols-1 h-full">
+  <form
+    (ngSubmit)="onSubmit()"
+    [formGroup]="loginForm"
+    class="px-3 content-center"
+  >
+    <h4 class="text-xl font-semibold mb-1">Monitor Glass</h4>
+    <p class="text-sm text-slate-400 mb-3">Login to Monitor glass app.</p>
+    <p-float-label variant="on" class="mb-3">
+      <input
+        type="email"
+        name="email"
+        id="email"
+        formControlName="email"
+        pInputText
+        fluid
+        placeholder="Email address"
+        class="focus-within:shadow-slate-400/25! focus-within:shadow-md!"
+      />
+      <label for="email">Email address</label>
+    </p-float-label>
+
+    <p-float-label variant="on" class="mb-3">
+      <input
+        type="password"
+        name="password"
+        id="password"
+        formControlName="password"
+        pInputText
+        fluid
+        placeholder="Password"
+        class="focus-within:shadow-slate-400/25! focus-within:shadow-md!"
+      />
+      <label for="password">Password</label>
+    </p-float-label>
+
+    <button
+      type="submit"
+      pButton
+      class="w-full hover:shadow-lg hover:shadow-primary-300/55"
+      size="small"
+      [loading]="loader()"
+    >
+      Login
+    </button>
+  </form>
+</div>

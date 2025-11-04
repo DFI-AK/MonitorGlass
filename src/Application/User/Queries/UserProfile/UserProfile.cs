@@ -1,5 +1,4 @@
-﻿using MonitorGlass.Application.Common.Interfaces;
-using MonitorGlass.Domain.Constants;
+﻿using MonitorGlass.Domain.Constants;
 
 namespace MonitorGlass.Application.User.Queries.UserProfile;
 

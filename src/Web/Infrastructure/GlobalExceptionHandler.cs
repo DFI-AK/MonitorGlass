@@ -21,9 +21,7 @@ internal sealed class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> log
 
         httpContext.Response.StatusCode = statusCode;
 
-        var detailMessage = _hostEnvironment.IsDevelopment()
-            ? exception.ToString()
-            : exception.Message;
+        var detailMessage = exception.Message;
 
         var activity = httpContext.Features.Get<IHttpActivityFeature>()?.Activity;
 

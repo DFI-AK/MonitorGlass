@@ -54,6 +54,9 @@ internal sealed class WindowsRepository(ILogger<WindowsRepository> logger, Appli
     public async Task<WindowsServer?> GetSystemInfoByNameAsync(string serverName, CancellationToken cancellationToken = default)
     => await _context.Windows.FirstOrDefaultAsync(x => !string.IsNullOrEmpty(x.MachineName) && (x.MachineName.ToLower() == serverName.ToLower()), cancellationToken);
 
+    public async Task<WindowsServer?> GetWindowsServerAsync(CancellationToken cancellationToken = default)
+     => await _context.Windows.AsNoTracking().FirstOrDefaultAsync(cancellationToken);
+
     public async Task<bool> IsExistAsync(string machineName, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrEmpty(machineName)) throw new ArgumentNullException(nameof(machineName), "Machine name cannot be null or empty.");

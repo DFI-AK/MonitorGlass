@@ -13,7 +13,7 @@ internal sealed class SystemMetricConfiguration : IEntityTypeConfiguration<Windo
         builder.HasOne(x => x.SystemInfo)
             .WithMany(x => x.Metrics)
             .HasForeignKey(x => x.SystemInfoId)
-            .OnDelete(DeleteBehavior.NoAction);
+            .OnDelete(DeleteBehavior.SetNull);
 
         builder.OwnsOne(x => x.CpuDetail, cpu => cpu.Property(x => x.CpuCoreUsage).HasPrecision(10, 2));
         builder.OwnsOne(x => x.MemoryDetail);

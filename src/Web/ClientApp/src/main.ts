@@ -7,12 +7,8 @@ import {
 } from '@angular/core';
 
 import { environment } from './environments/environment.prod';
-import {
-  HTTP_INTERCEPTORS,
-  provideHttpClient,
-  withInterceptorsFromDi,
-} from '@angular/common/http';
-import { AuthorizeInterceptor } from 'src/api-authorization/authorize.interceptor';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { authorizeInterceptor } from 'src/api-authorization/authorize.interceptor';
 import { BrowserModule, bootstrapApplication } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { provideRouter } from '@angular/router';
@@ -21,6 +17,7 @@ import { routes } from './app/app.route';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { providePrimeNG } from 'primeng/config';
 import Aura from '@primeuix/themes/aura';
+import { MessageService } from 'primeng/api';
 
 export function getBaseUrl() {
   return document.getElementsByTagName('base')[0].href;
@@ -39,8 +36,7 @@ bootstrapApplication(AppComponent, {
     ...providers,
     importProvidersFrom(BrowserModule, FormsModule),
     { provide: APP_ID, useValue: 'ng-cli-universal' },
-    { provide: HTTP_INTERCEPTORS, useClass: AuthorizeInterceptor, multi: true },
-    provideHttpClient(withInterceptorsFromDi()),
+    provideHttpClient(withInterceptors([authorizeInterceptor])),
     provideRouter(routes),
     provideAnimationsAsync(),
     providePrimeNG({
@@ -48,5 +44,6 @@ bootstrapApplication(AppComponent, {
         preset: Aura,
       },
     }),
+    MessageService,
   ],
 }).catch((err) => console.log(err));

@@ -1,0 +1,25 @@
+<div class="w-full px-4 py-3">
+  <p-menubar>
+    <ng-template #start>
+      <div class="flex items-center gap-x-3">
+        <i class="pi pi-chart-bar text-primary"></i>
+        <h4 class="text-lg font-semibold text-primary">Monitor Glass</h4>
+      </div>
+    </ng-template>
+
+    <ng-template #end>
+      <p-menu [model]="accountMenu()" [popup]="true" #account class="custom-menu" />
+      <button
+        type="button"
+        pButton
+        text
+        severity="contrast"
+        size="small"
+        [rounded]="true"
+        (click)="account.toggle($event)"
+      >
+        <i class="pi pi-ellipsis-v" pButtonIcon></i>
+      </button>
+    </ng-template>
+  </p-menubar>
+</div>

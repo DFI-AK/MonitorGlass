@@ -2,7 +2,7 @@ namespace MonitorGlass.Domain.Entities;
 
 public class WindowsMetric : BaseEntity<Guid>, IAuditableEntity
 {
-    public Guid SystemInfoId { get; set; }
+    public Guid? SystemInfoId { get; set; }
     public WindowsServer SystemInfo { get; set; } = null!;
     public CpuDetail CpuDetail { get; set; } = null!;
     public MemoryDetail MemoryDetail { get; set; } = null!;

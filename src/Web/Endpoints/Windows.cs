@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using MonitorGlass.Application.Common.Models;
 using MonitorGlass.Application.Windows.Commands.DeleteServer;
 using MonitorGlass.Application.Windows.Commands.AddServer;
+using MonitorGlass.Application.Windows.Queries.GetWindowsServers;
+using MonitorGlass.Domain.Entities;
 
 namespace MonitorGlass.Web.Endpoints;
 
@@ -24,6 +26,14 @@ public class Windows : EndpointGroupBase
         .Produces<ProblemDetails>(StatusCodes.Status400BadRequest)
         .Produces<Result>(StatusCodes.Status400BadRequest)
         .WithOpenApi();
+
+        groupBuilder.MapGet(GetWindowsServers, nameof(GetWindowsServers).ToLower())
+        .RequireAuthorization()
+        .WithSummary("Windows servers")
+        .WithDescription("Get the windows server.")
+        .Produces<WindowsDto>()
+        .Produces<ProblemDetails>(StatusCodes.Status404NotFound)
+        .WithOpenApi();
     }
 
     async Task<Results<Created<Result>, BadRequest>> AddServer(ISender sender, AddServerCommand command)
@@ -40,5 +50,13 @@ public class Windows : EndpointGroupBase
         return response.Succeeded
         ? TypedResults.Ok(response)
         : TypedResults.BadRequest(response);
+    }
+
+    async Task<Results<Ok<WindowsDto>, NotFound>> GetWindowsServers(ISender sender)
+    {
+        var response = await sender.Send(new GetWindowsServersQuery());
+        return response is null
+        ? TypedResults.NotFound()
+        : TypedResults.Ok(response);
     }
 }

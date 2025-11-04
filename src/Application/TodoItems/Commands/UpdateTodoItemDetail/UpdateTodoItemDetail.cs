@@ -1,5 +1,4 @@
-﻿using MonitorGlass.Application.Common.Interfaces;
-using MonitorGlass.Domain.Enums;
+﻿using MonitorGlass.Domain.Enums;
 
 namespace MonitorGlass.Application.TodoItems.Commands.UpdateTodoItemDetail;
 

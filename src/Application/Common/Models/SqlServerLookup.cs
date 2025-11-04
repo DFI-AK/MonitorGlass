@@ -1,4 +1,3 @@
-using MonitorGlass.Application.Common.Interfaces;
 using MonitorGlass.Domain.Entities;
 
 namespace MonitorGlass.Application.Common.Models;
@@ -59,32 +58,4 @@ public record DatabaseDto
             .ForMember(dest => dest.SizeMB, o => o.MapFrom(src => src.SizeInMb));
         }
     }
-}
-
-public sealed class DecryptValueResolver(IEncryptionService service)
-    : IMemberValueResolver<object, object, string?, string?>
-{
-    private readonly IEncryptionService _service = service;
-
-    public string? Resolve(
-        object source,
-        object destination,
-        string? sourceMember,
-        string? destMember,
-        ResolutionContext context)
-    {
-        return string.IsNullOrEmpty(sourceMember)
-            ? string.Empty
-            : _service.DecryptData(sourceMember);
-    }
-}
-
-public sealed class EncryptValueResolver(IEncryptionService service) : IMemberValueResolver<object, object, string?, string?>
-{
-    private readonly IEncryptionService _service = service;
-
-    public string? Resolve(object source, object destination, string? sourceMember, string? destMember, ResolutionContext context)
-        => string.IsNullOrEmpty(destMember)
-        ? string.Empty
-        : _service.EncryptData(destMember);
 }

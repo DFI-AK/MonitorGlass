@@ -5,3 +5,5 @@ global using Microsoft.EntityFrameworkCore;
 global using FluentValidation;
 global using MediatR;
 global using MonitorGlass.Application.Common.Models;
+global using MonitorGlass.Application.Common.Interfaces;
+global using MonitorGlass.Application.Common.Mappings;

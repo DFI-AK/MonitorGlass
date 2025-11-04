@@ -1,5 +1,4 @@
-﻿using MonitorGlass.Application.Common.Interfaces;
-using MonitorGlass.Domain.Events;
+﻿using MonitorGlass.Domain.Events;
 
 namespace MonitorGlass.Application.TodoItems.Commands.DeleteTodoItem;
 

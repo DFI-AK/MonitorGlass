@@ -1,0 +1,13 @@
+<div class="w-full h-full">
+  <p-splitter [panelSizes]="[20, 80]" class="w-full h-full">
+    <ng-template #panel>
+      <div class="w-full h-full">sidenav content will be here</div>
+    </ng-template>
+    <ng-template #panel>
+      <monitorglass-navbar />
+      <div class="w-full h-full px-4">
+        <router-outlet />
+      </div>
+    </ng-template>
+  </p-splitter>
+</div>

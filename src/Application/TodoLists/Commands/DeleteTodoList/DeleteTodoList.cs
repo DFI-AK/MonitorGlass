@@ -1,6 +1,4 @@
-﻿using MonitorGlass.Application.Common.Interfaces;
-
-namespace MonitorGlass.Application.TodoLists.Commands.DeleteTodoList;
+﻿namespace MonitorGlass.Application.TodoLists.Commands.DeleteTodoList;
 
 public record DeleteTodoListCommand(int Id) : IRequest;
 

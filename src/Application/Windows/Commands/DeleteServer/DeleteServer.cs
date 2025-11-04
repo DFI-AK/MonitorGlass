@@ -1,6 +1,4 @@
-﻿using MonitorGlass.Application.Common.Interfaces;
-
-namespace MonitorGlass.Application.Windows.Commands.DeleteServer;
+﻿namespace MonitorGlass.Application.Windows.Commands.DeleteServer;
 
 public record DeleteServerCommand(Guid ServerId) : IRequest<Result>;
 

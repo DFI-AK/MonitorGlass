@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics;
-using MonitorGlass.Application.Common.Interfaces;
 using Microsoft.Extensions.Logging;
 
 namespace MonitorGlass.Application.Common.Behaviours;

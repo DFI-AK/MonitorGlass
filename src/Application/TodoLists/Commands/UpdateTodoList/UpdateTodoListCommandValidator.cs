@@ -1,6 +1,4 @@
-﻿using MonitorGlass.Application.Common.Interfaces;
-
-namespace MonitorGlass.Application.TodoLists.Commands.UpdateTodoList;
+﻿namespace MonitorGlass.Application.TodoLists.Commands.UpdateTodoList;
 
 public class UpdateTodoListCommandValidator : AbstractValidator<UpdateTodoListCommand>
 {

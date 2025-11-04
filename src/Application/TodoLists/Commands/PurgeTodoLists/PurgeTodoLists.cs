@@ -1,5 +1,4 @@
-﻿using MonitorGlass.Application.Common.Interfaces;
-using MonitorGlass.Application.Common.Security;
+﻿using MonitorGlass.Application.Common.Security;
 using MonitorGlass.Domain.Constants;
 
 namespace MonitorGlass.Application.TodoLists.Commands.PurgeTodoLists;

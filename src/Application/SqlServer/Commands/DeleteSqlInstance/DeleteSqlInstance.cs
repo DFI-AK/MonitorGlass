@@ -1,6 +1,4 @@
-﻿using MonitorGlass.Application.Common.Interfaces;
-
-namespace MonitorGlass.Application.SqlServer.Commands.DeleteSqlInstance;
+﻿namespace MonitorGlass.Application.SqlServer.Commands.DeleteSqlInstance;
 
 public record DeleteSqlInstanceCommand(Guid InstanceId) : IRequest<Result>
 {

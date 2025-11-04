@@ -1,6 +1,4 @@
-﻿using MonitorGlass.Application.Common.Interfaces;
-
-namespace MonitorGlass.Application.TodoItems.Commands.UpdateTodoItem;
+﻿namespace MonitorGlass.Application.TodoItems.Commands.UpdateTodoItem;
 
 public record UpdateTodoItemCommand : IRequest
 {

@@ -8,7 +8,7 @@
       "name": "C#: MonitorGlass Debug",
       "type": "dotnet",
       "request": "launch",
-      "projectPath": "${workspaceFolder}/src/Web/Web.csproj"
+      "projectPath": "${workspaceFolder}/src/Web/Web.csproj",
     }
   ]
 }

@@ -1,7 +1,4 @@
-﻿using MonitorGlass.Application.Common.Interfaces;
-using MonitorGlass.Application.Common.Mappings;
-
-namespace MonitorGlass.Application.TodoItems.Queries.GetTodoItemsWithPagination;
+﻿namespace MonitorGlass.Application.TodoItems.Queries.GetTodoItemsWithPagination;
 
 public record GetTodoItemsWithPaginationQuery : IRequest<PaginatedList<TodoItemBriefDto>>
 {

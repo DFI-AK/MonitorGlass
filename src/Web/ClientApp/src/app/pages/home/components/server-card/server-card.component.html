@@ -1,0 +1,56 @@
+<p-card>
+  <div class="flex items-center justify-between">
+    <h4 class="text-2xl font-semibold">Server</h4>
+    <p-button
+      icon="pi pi-trash"
+      size="small"
+      text
+      [rounded]="true"
+      severity="danger"
+      (click)="serverOp.toggle($event)"
+    />
+  </div>
+  <p-divider class="my-1" />
+  <div class="flex items-center gap-x-2 mb-3">
+    <i class="pi pi-microsoft"></i>
+    <span>{{ server().serverName }}</span>
+  </div>
+
+  <div class="flex items-center gap-x-2 mb-3">
+    <i class="pi pi-arrow-circle-up"></i>
+    <span>{{ server().os }}</span>
+  </div>
+
+  <div class="flex items-center gap-x-2 mb-3">
+    <i class="pi pi-calendar"></i>
+    <span>{{ server().created | date : "longDate" }}</span>
+  </div>
+</p-card>
+
+<p-popover #serverOp>
+  <ng-template #content>
+    <div class="w-full">
+      <p class="text-sm mb-3">
+        Are you sure, you want to remove the
+        <strong>{{ server().serverName }}</strong
+        >?
+      </p>
+      <p-button
+        label="Cancel"
+        severity="danger"
+        size="small"
+        text
+        (click)="serverOp.hide()"
+        class="me-2!"
+      />
+
+      <p-button
+        label="Delete"
+        severity="secondary"
+        text
+        size="small"
+        (click)="onDelete(server().id)"
+      />
+    </div>
+  </ng-template>
+</p-popover>

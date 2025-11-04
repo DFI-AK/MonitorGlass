@@ -1,5 +1,4 @@
-﻿using MonitorGlass.Application.Common.Interfaces;
-using MonitorGlass.Domain.Entities;
+﻿using MonitorGlass.Domain.Entities;
 
 namespace MonitorGlass.Application.TodoLists.Commands.CreateTodoList;
 

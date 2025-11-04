@@ -1,7 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
-using MonitorGlass.Application.Common.Interfaces;
 using MonitorGlass.Domain.Entities;
 
 

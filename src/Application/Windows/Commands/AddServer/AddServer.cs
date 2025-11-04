@@ -1,19 +1,14 @@
-﻿using MonitorGlass.Application.Common.Interfaces;
+﻿using MonitorGlass.Domain.Entities;
 
 namespace MonitorGlass.Application.Windows.Commands.AddServer;
 
-public record AddServerCommand : IRequest<Result>
-{
-    public string? ServerName { get; init; }
-    public bool IsRemoteServer { get; init; }
-    public string? UserName { get; init; }
-    public string? Password { get; init; }
-}
+public record AddServerCommand : WindowsDto, IRequest<Result>;
 
-internal sealed class AddServerCommandHandler(IWindowsRepository repository, IWindowsProbeService probeService) : IRequestHandler<AddServerCommand, Result>
+internal sealed class AddServerCommandHandler(IWindowsRepository repository, IWindowsProbeService probeService, IMapper mapper) : IRequestHandler<AddServerCommand, Result>
 {
     private readonly IWindowsRepository _repository = repository;
     private readonly IWindowsProbeService _probeService = probeService;
+    private readonly IMapper _mapper = mapper;
     public async Task<Result> Handle(AddServerCommand request, CancellationToken cancellationToken)
     {
         if (string.IsNullOrEmpty(request.ServerName))
@@ -33,24 +28,17 @@ internal sealed class AddServerCommandHandler(IWindowsRepository repository, IWi
         {
             throw new InvalidOperationException($"Server '{request.ServerName}' is not reachable.");
         }
-        string operatingSystem = string.Empty;
+        string operatingSystem = await _probeService.GetLocalOperatingSystemAsync(request.ServerName, cancellationToken);
 
-        if (request.IsRemoteServer && !string.IsNullOrEmpty(request.UserName) && !string.IsNullOrEmpty(request.Password))
-        {
-            operatingSystem = await _probeService.GetOperatingSystemRemoteAsync(request.ServerName, request.UserName, request.Password, cancellationToken);
-        }
-        else
-        {
-            operatingSystem = await _probeService.GetLocalOperatingSystemAsync(request.ServerName, cancellationToken);
-        }
-
-        var server = new Domain.Entities.WindowsServer
+        var server = new WindowsServer
         {
             MachineName = request.ServerName,
             OSVersion = operatingSystem,
         };
 
-        var entity = await _repository.CreateSystemInfoAsync(server, cancellationToken);
+        server = _mapper.Map(request, server);
+
+        var entity = await _repository.CreateSystemInfoAsync(_mapper.Map<WindowsServer>(server), cancellationToken);
         return entity is null ? throw new ApplicationException("Failed to add the server.") : Result.Success();
     }
 }

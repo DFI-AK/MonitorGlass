@@ -1,0 +1,10 @@
+@import "tailwindcss";
+@import "tailwindcss-primeui";
+
+:host ::ng-deep .custom-menu .p-menuitem {
+  @apply text-sm;
+}
+
+:host ::ng-deep .custom-menu .p-menu-submenu-label {
+  @apply text-primary-400;
+}
