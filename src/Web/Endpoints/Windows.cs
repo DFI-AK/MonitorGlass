@@ -4,7 +4,8 @@ using MonitorGlass.Application.Common.Models;
 using MonitorGlass.Application.Windows.Commands.DeleteServer;
 using MonitorGlass.Application.Windows.Commands.AddServer;
 using MonitorGlass.Application.Windows.Queries.GetWindowsServers;
-using MonitorGlass.Domain.Entities;
+using MonitorGlass.Infrastructure.Hubs;
+using Microsoft.AspNetCore.Http.Connections;
 
 namespace MonitorGlass.Web.Endpoints;
 
@@ -12,10 +13,12 @@ public class Windows : EndpointGroupBase
 {
     public override void Map(RouteGroupBuilder groupBuilder)
     {
+        groupBuilder.MapHub<WindowsHub>("/windows_metric", o => o.Transports = HttpTransportType.WebSockets);
+
         groupBuilder.MapPost(AddServer, nameof(AddServer).ToLower())
         .WithSummary("Add new server")
         .WithDescription("Adds a new server to be monitored.")
-        .Produces<Result>(StatusCodes.Status201Created)
+        .Produces<Result>(StatusCodes.Status200OK)
         .Produces<ProblemDetails>(StatusCodes.Status400BadRequest)
         .WithOpenApi();
 
@@ -36,11 +39,11 @@ public class Windows : EndpointGroupBase
         .WithOpenApi();
     }
 
-    async Task<Results<Created<Result>, BadRequest>> AddServer(ISender sender, AddServerCommand command)
+    async Task<Results<Ok<Result>, BadRequest>> AddServer(ISender sender, AddServerCommand command)
     {
         var response = await sender.Send(command);
         return response.Succeeded
-        ? TypedResults.Created(string.Empty, response)
+        ? TypedResults.Ok(response)
         : TypedResults.BadRequest();
     }
 

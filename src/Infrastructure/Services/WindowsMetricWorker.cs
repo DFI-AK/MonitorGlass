@@ -1,18 +1,23 @@
+using AutoMapper;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using MonitorGlass.Application.Common.Interfaces;
+using MonitorGlass.Application.Common.Models;
+using MonitorGlass.Infrastructure.Hubs;
 
 namespace MonitorGlass.Infrastructure.Services;
 
 internal sealed class WindowsMetricWorker(
     ILogger<WindowsMetricWorker> logger,
-    IServiceScopeFactory scopeFactory)
+    IServiceScopeFactory scopeFactory, IHubContext<WindowsHub, IWindowsHub> hubContext, IMapper mapper)
     : BackgroundService, IWindowsMetricWorker
 {
     private readonly ILogger<WindowsMetricWorker> _logger = logger;
     private readonly IServiceScopeFactory _scopeFactory = scopeFactory;
+    private readonly IHubContext<WindowsHub, IWindowsHub> _hubContext = hubContext;
 
     public async Task StartCollectMetricsAsync(CancellationToken cancellationToken = default)
     {
@@ -48,6 +53,10 @@ internal sealed class WindowsMetricWorker(
                     metric.SystemInfoId = systemInfo.Id;
                     await systemRepository.CreateSystemMetricAsync(metric, cancellationToken);
                     _logger.LogInformation("Collected and stored metrics for machine: {MachineName}", machineName);
+
+                    var data = mapper.Map<WindowsMetricDto>(metric);
+
+                    await _hubContext.Clients.All.WindowsMetrics(data);
                 }
             }
             catch (Exception ex)

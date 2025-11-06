@@ -1,0 +1,24 @@
+<div class="w-full p-2 flex items-center gap-x-2">
+  <p-float-label variant="on">
+    <p-select
+      [options]="options"
+      id="range_selector"
+      [(ngModel)]="selectedOption"
+      class="w-56 max-w-64"
+      size="small"
+      optionLabel="label"
+    />
+    <label for="range_selector">Live/History</label>
+  </p-float-label>
+  @if (selectedOption()?.enableRange) {
+  <p-date-picker
+    selectionMode="range"
+    [(ngModel)]="dateRange"
+    placeholder="Enter date range"
+    icon="pi pi-calendar"
+    showIcon
+    iconDisplay="input"
+    size="small"
+  />
+  }
+</div>

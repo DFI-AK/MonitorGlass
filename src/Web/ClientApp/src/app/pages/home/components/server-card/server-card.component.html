@@ -12,19 +12,116 @@
   </div>
   <p-divider class="my-1" />
   <div class="flex items-center gap-x-2 mb-3">
-    <i class="pi pi-microsoft"></i>
+    <span class="material-symbols-outlined text-slate-400"> window </span>
     <span>{{ server().serverName }}</span>
   </div>
 
   <div class="flex items-center gap-x-2 mb-3">
-    <i class="pi pi-arrow-circle-up"></i>
+    <span class="material-symbols-outlined text-slate-400">
+      laptop_windows
+    </span>
     <span>{{ server().os }}</span>
   </div>
 
   <div class="flex items-center gap-x-2 mb-3">
-    <i class="pi pi-calendar"></i>
+    <span class="material-symbols-outlined text-slate-400">
+      calendar_today
+    </span>
     <span>{{ server().created | date : "longDate" }}</span>
   </div>
+
+  @if (!metric()) {
+  <span class="text-sm text-slate-400">Loading live metrics...</span>
+  }@else {
+  <p-divider class="my-2" />
+  <p class="text-sm font-semibold text-primary mb-3">Realtime data</p>
+  <div class="grid grid-cols-2 gap-x-2 text-sm">
+    <div class="flex items-center gap-x-2 mb-3">
+      <span class="material-symbols-outlined text-slate-400"> memory </span>
+      <span>Cores : {{ metric()?.cpu.cores || 0 }}</span>
+    </div>
+
+    <div class="flex items-center gap-x-2 mb-3">
+      <span class="material-symbols-outlined text-slate-400"> heat_pump </span>
+      <span>Core usage : {{ metric()?.cpu.coreUsage || 0 }}</span>
+    </div>
+
+    <div class="flex items-center gap-x-2 mb-3">
+      <span class="material-symbols-outlined text-slate-400"> av_timer </span>
+      <span>Process count : {{ metric()?.cpu.processCount || 0 }}</span>
+    </div>
+
+    <div class="flex items-center gap-x-2 mb-3">
+      <span class="material-symbols-outlined text-slate-400"> step </span>
+      <span>Thread count : {{ metric()?.cpu.threadCount || 0 }}</span>
+    </div>
+
+    <div class="flex items-center gap-x-2 mb-3">
+      <span class="material-symbols-outlined text-slate-400"> memory_alt </span>
+      <span
+        >Total memory :
+        {{ metric()?.memory.totalMemoryMB | byteConvertor : "mb" : "gb" }}</span
+      >
+    </div>
+
+    <div class="flex items-center gap-x-2 mb-3">
+      <span class="material-symbols-outlined" [ngClass]="ramColorIndicator()">
+        data_usage
+      </span>
+      <span
+        >Available memory :
+        {{
+          metric()?.memory.availableMemoryMB | byteConvertor : "mb" : "gb"
+        }}</span
+      >
+    </div>
+
+    <div class="flex items-center gap-x-2 mb-3">
+      <span class="material-symbols-outlined" [ngClass]="ramColorIndicator()">
+        memory_alt
+      </span>
+      <span
+        >Used memory :
+        {{ metric()?.memory.usedMemoryMB | byteConvertor : "mb" : "gb" }}</span
+      >
+    </div>
+    @for (disk of metric().diskDetails; track disk.driveLetter) {
+    <div class="flex items-center gap-x-2 mb-3">
+      <span
+        class="material-symbols-outlined"
+        [ngClass]="{
+          'text-green-400':
+            ((disk.diskTotalSpaceGB - disk.diskFreeSpaceGB) /
+              disk.diskTotalSpaceGB) *
+              100 <=
+            66,
+          'text-amber-500':
+            ((disk.diskTotalSpaceGB - disk.diskFreeSpaceGB) /
+              disk.diskTotalSpaceGB) *
+              100 >=
+              66 ||
+            ((disk.diskTotalSpaceGB - disk.diskFreeSpaceGB) /
+              disk.diskTotalSpaceGB) *
+              100 <=
+              83,
+          'text-red-500':
+            ((disk.diskTotalSpaceGB - disk.diskFreeSpaceGB) /
+              disk.diskTotalSpaceGB) *
+              100 >
+            83
+        }"
+      >
+        hard_drive
+      </span>
+      <span
+        >{{ disk.driveLetter }}
+        {{ disk.diskFreeSpaceGB | byteConvertor : "gb" : "gb" }} of
+        {{ disk.diskTotalSpaceGB | byteConvertor : "gb" : "gb" }}</span
+      >
+    </div>
+    }
+  </div>
+  }
 </p-card>
 
 <p-popover #serverOp>

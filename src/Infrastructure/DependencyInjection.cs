@@ -67,5 +67,11 @@ public static class DependencyInjection
 
         builder.Services.AddAuthorization(options =>
             options.AddPolicy(Policies.CanPurge, policy => policy.RequireRole(Roles.Administrator)));
+
+        builder.Services.AddSignalR();
+        var allowedOrigins = builder.Configuration.GetSection("AllowedOrigins").Get<List<string>>()
+        ?? throw new InvalidOperationException("Allowed origins are missing from appsettings.");
+
+        builder.Services.AddCors(o => o.AddPolicy("AllowedOrigins", p => p.WithOrigins([.. allowedOrigins]).AllowAnyHeader().AllowAnyMethod().AllowCredentials()));
     }
 }
