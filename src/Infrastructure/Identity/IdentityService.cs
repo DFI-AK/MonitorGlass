@@ -77,7 +77,7 @@ public class IdentityService(
     public async Task<UserDto?> GetUserAsync(string userId, CancellationToken cancellationToken = default)
     {
         var appUser = await _userManager.FindByIdAsync(userId)
-        ?? throw new KeyNotFoundException($"User not found with this id '{userId}'");
+        ?? throw new UnauthorizedAccessException($"User not found with this id '{userId}'");
 
         var user = _mapper.Map<UserDto>(appUser);
         var roles = await _userManager.GetRolesAsync(appUser);

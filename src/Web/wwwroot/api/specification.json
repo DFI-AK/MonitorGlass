@@ -726,6 +726,85 @@
           }
         ]
       }
+    },
+    "/api/Windows/gethistoricalwindowsmetrics": {
+      "get": {
+        "tags": [
+          "Windows"
+        ],
+        "summary": "Windows Metrics Historical data",
+        "description": "Get the paginated windows hsitorical data with datetime range.",
+        "operationId": "GetHistoricalWindowsMetrics",
+        "parameters": [
+          {
+            "name": "pageNumber",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 2
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "x-position": 3
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "x-position": 4
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedListOfWindowsMetricDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
     }
   },
   "components": {
@@ -1129,6 +1208,188 @@
             "type": "string",
             "format": "date-time",
             "nullable": true
+          }
+        }
+      },
+      "PaginatedListOfWindowsMetricDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WindowsMetricDto"
+            }
+          },
+          "pageNumber": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalPages": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "hasPreviousPage": {
+            "type": "boolean"
+          },
+          "hasNextPage": {
+            "type": "boolean"
+          }
+        }
+      },
+      "WindowsMetricDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "serverId": {
+            "type": "string",
+            "format": "guid"
+          },
+          "cpu": {
+            "$ref": "#/components/schemas/CpuDto"
+          },
+          "memory": {
+            "$ref": "#/components/schemas/MemoryDto"
+          },
+          "diskDetails": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DiskDto"
+            }
+          },
+          "networkDetails": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/NetworkDto"
+            }
+          },
+          "created": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "CpuDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "cores": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "coreUsage": {
+            "type": "number",
+            "format": "double"
+          },
+          "processCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "threadCount": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "MemoryDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "totalMemoryMB": {
+            "type": "number",
+            "format": "double"
+          },
+          "usedMemoryMB": {
+            "type": "number",
+            "format": "double"
+          },
+          "availableMemoryMB": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      },
+      "DiskDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "driveLetter": {
+            "type": "string",
+            "nullable": true
+          },
+          "diskReadSpeedMBps": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "diskWriteSpeedMBps": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "diskIOPS": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "diskFreeSpaceGB": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "diskTotalSpaceGB": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "created": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "NetworkDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "interfaceName": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "macAddress": {
+            "type": "string"
+          },
+          "iPv4Address": {
+            "type": "string"
+          },
+          "iPv6Address": {
+            "type": "string",
+            "nullable": true
+          },
+          "isUp": {
+            "type": "boolean"
+          },
+          "speedMbps": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "bytesSent": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "bytesReceived": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "created": {
+            "type": "string",
+            "format": "date-time"
           }
         }
       }

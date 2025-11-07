@@ -20,7 +20,13 @@
   </div>
 
   }@else {
-  <monitorglass-windows-history />
+  <monitorglass-windows-history
+    [metrics]="historicalMetric()"
+    [loading]="isHistoricalLoading()"
+    [pagination]="pagination()"
+    [metricTotalRecord]="metricTotalRecord()"
+    (paginationEvent)="onPaginationChange($event)"
+  />
   } } @else {
   <span class="text-sm text-slate-400"
     >No servers are added yet, &nbsp;

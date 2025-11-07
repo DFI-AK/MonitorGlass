@@ -1,15 +1,21 @@
+using System.Collections.ObjectModel;
+using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using MonitorGlass.Application.Common.Interfaces;
+using MonitorGlass.Application.Common.Mappings;
+using MonitorGlass.Application.Common.Models;
 using MonitorGlass.Domain.Entities;
 using MonitorGlass.Infrastructure.Data;
 
 namespace MonitorGlass.Infrastructure.Repository;
 
-internal sealed class WindowsMetricRepository(ILogger<WindowsMetricRepository> logger, ApplicationDbContext context) : IWindowsMetricRepository
+internal sealed class WindowsMetricRepository(ILogger<WindowsMetricRepository> logger, ApplicationDbContext context, IMapper mapper) : IWindowsMetricRepository
 {
     private readonly ILogger<WindowsMetricRepository> _logger = logger;
     private readonly ApplicationDbContext _context = context;
+    private readonly IMapper _mapper = mapper;
 
     public async Task<WindowsMetric?> CreateSystemMetricAsync(WindowsMetric systemMetric, CancellationToken cancellationToken = default)
     {
@@ -42,6 +48,15 @@ internal sealed class WindowsMetricRepository(ILogger<WindowsMetricRepository> l
         _logger.LogInformation("Successfully retrieved {SystemMetricsCount} SystemMetrics", systemMetrics.Count);
         return systemMetrics;
     }
+
+    public async Task<PaginatedList<WindowsMetricDto>> GetHistoricalDataAsync(int pageNumber, int pageSize, DateTimeOffset from, DateTimeOffset to, CancellationToken cancellationToken = default)
+     => await _context.WindowsMetrics
+        .Where(x => x.Created >= from.ToUniversalTime() && x.Created <= to.ToUniversalTime())
+        .OrderByDescending(x => x.Created)
+        .AsNoTracking()
+        .ProjectTo<WindowsMetricDto>(_mapper.ConfigurationProvider)
+        .PaginatedListAsync(pageNumber, pageSize, cancellationToken);
+
 
     public async Task<WindowsMetric?> GetSystemMetricByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {

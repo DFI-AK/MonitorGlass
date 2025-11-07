@@ -8,4 +8,6 @@ public interface IWindowsMetricRepository
     Task<bool> DeleteSystemMetricAsync(Guid id, CancellationToken cancellationToken = default);
     Task<IEnumerable<WindowsMetric>> GetAllSystemMetricsAsync(CancellationToken cancellationToken = default);
     Task<WindowsMetric?> GetSystemMetricByIdAsync(Guid id, CancellationToken cancellationToken = default);
+
+    Task<PaginatedList<WindowsMetricDto>> GetHistoricalDataAsync(int pageNumber, int pageSize, DateTimeOffset from, DateTimeOffset to, CancellationToken cancellationToken = default);
 }

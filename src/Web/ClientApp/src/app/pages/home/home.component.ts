@@ -9,7 +9,10 @@ import {
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { ButtonDirective, ButtonIcon, ButtonLabel } from 'primeng/button';
 import { PopoverModule } from 'primeng/popover';
-import { WindowsService } from 'src/app/core/services/windows.service';
+import {
+  PaginationForHistorical,
+  WindowsService,
+} from 'src/app/core/services/windows.service';
 import { environment } from 'src/environments/environment';
 import { FloatLabel } from 'primeng/floatlabel';
 import { InputText } from 'primeng/inputtext';
@@ -19,7 +22,7 @@ import {
   DatetimeRangeComponent,
   RangeSeletor,
 } from 'src/app/core/ui/datetime-range/datetime-range.component';
-import { WindowsHistoryComponent } from "./components/windows-history/windows-history.component";
+import { WindowsHistoryComponent } from './components/windows-history/windows-history.component';
 
 @Component({
   selector: 'monitorglass-home',
@@ -35,8 +38,8 @@ import { WindowsHistoryComponent } from "./components/windows-history/windows-hi
     FormsModule,
     ServerCardComponent,
     DatetimeRangeComponent,
-    WindowsHistoryComponent
-],
+    WindowsHistoryComponent,
+  ],
 })
 export class HomeComponent implements OnDestroy, OnInit {
   private _windowsService = inject(WindowsService);
@@ -48,6 +51,17 @@ export class HomeComponent implements OnDestroy, OnInit {
     () =>
       this._windowsService.metric()[this._windowsService.metric().length - 1] ??
       null
+  );
+  private _historicalMetrics = this._windowsService.historicalMetrics;
+  protected pagination = this._windowsService.historicalPagination;
+  protected historicalMetric = computed(
+    () => this._historicalMetrics.value()?.items
+  );
+  protected isHistoricalLoading = computed(() =>
+    this._historicalMetrics.isLoading()
+  );
+  protected metricTotalRecord = computed(
+    () => this._historicalMetrics.value()?.totalCount
   );
 
   protected rangeSelector: RangeSeletor;
@@ -90,5 +104,20 @@ export class HomeComponent implements OnDestroy, OnInit {
 
   rangeSelection(value: RangeSeletor) {
     this.rangeSelector = value;
+    if (!value.value) return;
+
+    this.pagination.update((prev) => ({
+      ...prev,
+      to: new Date(),
+      from: value.value,
+    }));
+  }
+
+  onPaginationChange(value: PaginationForHistorical) {
+    this.pagination.update((prev) => ({
+      ...prev,
+      pageNumber: value.pageNumber,
+      pageSize: value.pageSize,
+    }));
   }
 }

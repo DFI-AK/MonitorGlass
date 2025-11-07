@@ -75,7 +75,7 @@ internal sealed class WindowsMetricWorker(
         while (!stoppingToken.IsCancellationRequested)
         {
             await StartCollectMetricsAsync(stoppingToken);
-            await Task.Delay(TimeSpan.FromSeconds(30), stoppingToken); // configurable interval
+            await Task.Delay(TimeSpan.FromSeconds(15), stoppingToken); // configurable interval
         }
     }
 }

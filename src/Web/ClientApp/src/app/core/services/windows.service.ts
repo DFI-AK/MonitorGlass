@@ -1,7 +1,16 @@
-import { inject, Injectable, signal } from '@angular/core';
-import { catchError, finalize, map, of, switchMap, tap } from 'rxjs';
+import { inject, Injectable, resource, signal } from '@angular/core';
+import {
+  catchError,
+  delay,
+  finalize,
+  firstValueFrom,
+  map,
+  of,
+  switchMap,
+} from 'rxjs';
 import {
   AddServerCommand,
+  PaginatedListOfWindowsMetricDto,
   WindowsClient,
   WindowsDto,
 } from 'src/app/web-api-client';
@@ -16,6 +25,13 @@ import { environment } from 'src/environments/environment';
 import { WindowsMetricDto } from '../utils/models';
 
 export type Windows = Omit<WindowsDto, 'init' | 'fromJS' | 'toJSON'>;
+
+export type PaginationForHistorical = Partial<{
+  pageNumber: number;
+  pageSize: number;
+  from: Date;
+  to: Date;
+}>;
 
 @Injectable({
   providedIn: 'root',
@@ -33,6 +49,27 @@ export class WindowsService {
 
   private _metric = signal<ReadonlyArray<WindowsMetricDto>>([]);
   public metric = this._metric.asReadonly();
+
+  public historicalPagination = signal<PaginationForHistorical>({
+    pageNumber: 1,
+    pageSize: 10,
+  });
+  public historicalMetrics = resource<
+    PaginatedListOfWindowsMetricDto,
+    PaginationForHistorical
+  >({
+    params: () => this.historicalPagination(),
+    loader: async ({ params }) => {
+      const { from, pageNumber, pageSize, to } = params;
+      const observable$ = this._windowsClient
+        .getHistoricalWindowsMetrics(pageNumber, pageSize, from, to)
+        .pipe(
+          delay(800),
+          catchError((err) => this._errorService.handleUnauthorizeError(err))
+        );
+      return firstValueFrom(observable$);
+    },
+  });
 
   constructor() {
     this.initializeHubconnection();
@@ -52,6 +89,8 @@ export class WindowsService {
 
   public async destroy() {
     this._windows.set(null);
+    this._metric.set([]);
+    this.historicalMetrics.destroy();
     if (this._hubConnection) {
       try {
         await this._hubConnection.stop();

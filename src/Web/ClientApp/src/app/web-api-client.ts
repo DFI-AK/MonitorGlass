@@ -909,6 +909,10 @@ export interface IWindowsClient {
      * Windows servers
      */
     getWindowsServers(): Observable<WindowsDto>;
+    /**
+     * Windows Metrics Historical data
+     */
+    getHistoricalWindowsMetrics(pageNumber: number, pageSize: number, from: Date, to: Date): Observable<PaginatedListOfWindowsMetricDto>;
 }
 
 @Injectable({
@@ -1089,6 +1093,80 @@ export class WindowsClient implements IWindowsClient {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
             result200 = WindowsDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status === 404) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result404: any = null;
+            let resultData404 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result404 = ProblemDetails.fromJS(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * Windows Metrics Historical data
+     */
+    getHistoricalWindowsMetrics(pageNumber: number, pageSize: number, from: Date, to: Date): Observable<PaginatedListOfWindowsMetricDto> {
+        let url_ = this.baseUrl + "/api/Windows/gethistoricalwindowsmetrics?";
+        if (pageNumber === undefined || pageNumber === null)
+            throw new Error("The parameter 'pageNumber' must be defined and cannot be null.");
+        else
+            url_ += "pageNumber=" + encodeURIComponent("" + pageNumber) + "&";
+        if (pageSize === undefined || pageSize === null)
+            throw new Error("The parameter 'pageSize' must be defined and cannot be null.");
+        else
+            url_ += "pageSize=" + encodeURIComponent("" + pageSize) + "&";
+        if (from === undefined || from === null)
+            throw new Error("The parameter 'from' must be defined and cannot be null.");
+        else
+            url_ += "from=" + encodeURIComponent(from ? "" + from.toISOString() : "") + "&";
+        if (to === undefined || to === null)
+            throw new Error("The parameter 'to' must be defined and cannot be null.");
+        else
+            url_ += "to=" + encodeURIComponent(to ? "" + to.toISOString() : "") + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetHistoricalWindowsMetrics(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetHistoricalWindowsMetrics(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<PaginatedListOfWindowsMetricDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<PaginatedListOfWindowsMetricDto>;
+        }));
+    }
+
+    protected processGetHistoricalWindowsMetrics(response: HttpResponseBase): Observable<PaginatedListOfWindowsMetricDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = PaginatedListOfWindowsMetricDto.fromJS(resultData200);
             return _observableOf(result200);
             }));
         } else if (status === 404) {
@@ -2132,6 +2210,366 @@ export class AddServerCommand extends WindowsDto implements IAddServerCommand {
 }
 
 export interface IAddServerCommand extends IWindowsDto {
+}
+
+export class PaginatedListOfWindowsMetricDto implements IPaginatedListOfWindowsMetricDto {
+    items?: WindowsMetricDto[];
+    pageNumber?: number;
+    totalPages?: number;
+    totalCount?: number;
+    hasPreviousPage?: boolean;
+    hasNextPage?: boolean;
+
+    constructor(data?: IPaginatedListOfWindowsMetricDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            if (Array.isArray(_data["items"])) {
+                this.items = [] as any;
+                for (let item of _data["items"])
+                    this.items!.push(WindowsMetricDto.fromJS(item));
+            }
+            this.pageNumber = _data["pageNumber"];
+            this.totalPages = _data["totalPages"];
+            this.totalCount = _data["totalCount"];
+            this.hasPreviousPage = _data["hasPreviousPage"];
+            this.hasNextPage = _data["hasNextPage"];
+        }
+    }
+
+    static fromJS(data: any): PaginatedListOfWindowsMetricDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new PaginatedListOfWindowsMetricDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.items)) {
+            data["items"] = [];
+            for (let item of this.items)
+                data["items"].push(item.toJSON());
+        }
+        data["pageNumber"] = this.pageNumber;
+        data["totalPages"] = this.totalPages;
+        data["totalCount"] = this.totalCount;
+        data["hasPreviousPage"] = this.hasPreviousPage;
+        data["hasNextPage"] = this.hasNextPage;
+        return data;
+    }
+}
+
+export interface IPaginatedListOfWindowsMetricDto {
+    items?: WindowsMetricDto[];
+    pageNumber?: number;
+    totalPages?: number;
+    totalCount?: number;
+    hasPreviousPage?: boolean;
+    hasNextPage?: boolean;
+}
+
+export class WindowsMetricDto implements IWindowsMetricDto {
+    serverId?: string;
+    cpu?: CpuDto;
+    memory?: MemoryDto;
+    diskDetails?: DiskDto[];
+    networkDetails?: NetworkDto[];
+    created?: Date;
+
+    constructor(data?: IWindowsMetricDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.serverId = _data["serverId"];
+            this.cpu = _data["cpu"] ? CpuDto.fromJS(_data["cpu"]) : <any>undefined;
+            this.memory = _data["memory"] ? MemoryDto.fromJS(_data["memory"]) : <any>undefined;
+            if (Array.isArray(_data["diskDetails"])) {
+                this.diskDetails = [] as any;
+                for (let item of _data["diskDetails"])
+                    this.diskDetails!.push(DiskDto.fromJS(item));
+            }
+            if (Array.isArray(_data["networkDetails"])) {
+                this.networkDetails = [] as any;
+                for (let item of _data["networkDetails"])
+                    this.networkDetails!.push(NetworkDto.fromJS(item));
+            }
+            this.created = _data["created"] ? new Date(_data["created"].toString()) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): WindowsMetricDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new WindowsMetricDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["serverId"] = this.serverId;
+        data["cpu"] = this.cpu ? this.cpu.toJSON() : <any>undefined;
+        data["memory"] = this.memory ? this.memory.toJSON() : <any>undefined;
+        if (Array.isArray(this.diskDetails)) {
+            data["diskDetails"] = [];
+            for (let item of this.diskDetails)
+                data["diskDetails"].push(item.toJSON());
+        }
+        if (Array.isArray(this.networkDetails)) {
+            data["networkDetails"] = [];
+            for (let item of this.networkDetails)
+                data["networkDetails"].push(item.toJSON());
+        }
+        data["created"] = this.created ? this.created.toISOString() : <any>undefined;
+        return data;
+    }
+}
+
+export interface IWindowsMetricDto {
+    serverId?: string;
+    cpu?: CpuDto;
+    memory?: MemoryDto;
+    diskDetails?: DiskDto[];
+    networkDetails?: NetworkDto[];
+    created?: Date;
+}
+
+export class CpuDto implements ICpuDto {
+    cores?: number;
+    coreUsage?: number;
+    processCount?: number;
+    threadCount?: number;
+
+    constructor(data?: ICpuDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.cores = _data["cores"];
+            this.coreUsage = _data["coreUsage"];
+            this.processCount = _data["processCount"];
+            this.threadCount = _data["threadCount"];
+        }
+    }
+
+    static fromJS(data: any): CpuDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new CpuDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["cores"] = this.cores;
+        data["coreUsage"] = this.coreUsage;
+        data["processCount"] = this.processCount;
+        data["threadCount"] = this.threadCount;
+        return data;
+    }
+}
+
+export interface ICpuDto {
+    cores?: number;
+    coreUsage?: number;
+    processCount?: number;
+    threadCount?: number;
+}
+
+export class MemoryDto implements IMemoryDto {
+    totalMemoryMB?: number;
+    usedMemoryMB?: number;
+    availableMemoryMB?: number;
+
+    constructor(data?: IMemoryDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.totalMemoryMB = _data["totalMemoryMB"];
+            this.usedMemoryMB = _data["usedMemoryMB"];
+            this.availableMemoryMB = _data["availableMemoryMB"];
+        }
+    }
+
+    static fromJS(data: any): MemoryDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new MemoryDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["totalMemoryMB"] = this.totalMemoryMB;
+        data["usedMemoryMB"] = this.usedMemoryMB;
+        data["availableMemoryMB"] = this.availableMemoryMB;
+        return data;
+    }
+}
+
+export interface IMemoryDto {
+    totalMemoryMB?: number;
+    usedMemoryMB?: number;
+    availableMemoryMB?: number;
+}
+
+export class DiskDto implements IDiskDto {
+    driveLetter?: string | undefined;
+    diskReadSpeedMBps?: number | undefined;
+    diskWriteSpeedMBps?: number | undefined;
+    diskIOPS?: number | undefined;
+    diskFreeSpaceGB?: number | undefined;
+    diskTotalSpaceGB?: number | undefined;
+    created?: Date;
+
+    constructor(data?: IDiskDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.driveLetter = _data["driveLetter"];
+            this.diskReadSpeedMBps = _data["diskReadSpeedMBps"];
+            this.diskWriteSpeedMBps = _data["diskWriteSpeedMBps"];
+            this.diskIOPS = _data["diskIOPS"];
+            this.diskFreeSpaceGB = _data["diskFreeSpaceGB"];
+            this.diskTotalSpaceGB = _data["diskTotalSpaceGB"];
+            this.created = _data["created"] ? new Date(_data["created"].toString()) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): DiskDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new DiskDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["driveLetter"] = this.driveLetter;
+        data["diskReadSpeedMBps"] = this.diskReadSpeedMBps;
+        data["diskWriteSpeedMBps"] = this.diskWriteSpeedMBps;
+        data["diskIOPS"] = this.diskIOPS;
+        data["diskFreeSpaceGB"] = this.diskFreeSpaceGB;
+        data["diskTotalSpaceGB"] = this.diskTotalSpaceGB;
+        data["created"] = this.created ? this.created.toISOString() : <any>undefined;
+        return data;
+    }
+}
+
+export interface IDiskDto {
+    driveLetter?: string | undefined;
+    diskReadSpeedMBps?: number | undefined;
+    diskWriteSpeedMBps?: number | undefined;
+    diskIOPS?: number | undefined;
+    diskFreeSpaceGB?: number | undefined;
+    diskTotalSpaceGB?: number | undefined;
+    created?: Date;
+}
+
+export class NetworkDto implements INetworkDto {
+    interfaceName?: string;
+    description?: string;
+    macAddress?: string;
+    iPv4Address?: string;
+    iPv6Address?: string | undefined;
+    isUp?: boolean;
+    speedMbps?: number;
+    bytesSent?: number;
+    bytesReceived?: number;
+    created?: Date;
+
+    constructor(data?: INetworkDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.interfaceName = _data["interfaceName"];
+            this.description = _data["description"];
+            this.macAddress = _data["macAddress"];
+            this.iPv4Address = _data["iPv4Address"];
+            this.iPv6Address = _data["iPv6Address"];
+            this.isUp = _data["isUp"];
+            this.speedMbps = _data["speedMbps"];
+            this.bytesSent = _data["bytesSent"];
+            this.bytesReceived = _data["bytesReceived"];
+            this.created = _data["created"] ? new Date(_data["created"].toString()) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): NetworkDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new NetworkDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["interfaceName"] = this.interfaceName;
+        data["description"] = this.description;
+        data["macAddress"] = this.macAddress;
+        data["iPv4Address"] = this.iPv4Address;
+        data["iPv6Address"] = this.iPv6Address;
+        data["isUp"] = this.isUp;
+        data["speedMbps"] = this.speedMbps;
+        data["bytesSent"] = this.bytesSent;
+        data["bytesReceived"] = this.bytesReceived;
+        data["created"] = this.created ? this.created.toISOString() : <any>undefined;
+        return data;
+    }
+}
+
+export interface INetworkDto {
+    interfaceName?: string;
+    description?: string;
+    macAddress?: string;
+    iPv4Address?: string;
+    iPv6Address?: string | undefined;
+    isUp?: boolean;
+    speedMbps?: number;
+    bytesSent?: number;
+    bytesReceived?: number;
+    created?: Date;
 }
 
 export class SwaggerException extends Error {

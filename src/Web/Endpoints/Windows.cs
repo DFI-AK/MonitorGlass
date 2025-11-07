@@ -6,6 +6,7 @@ using MonitorGlass.Application.Windows.Commands.AddServer;
 using MonitorGlass.Application.Windows.Queries.GetWindowsServers;
 using MonitorGlass.Infrastructure.Hubs;
 using Microsoft.AspNetCore.Http.Connections;
+using MonitorGlass.Application.WindowsHistoryMetric.Queries.WindowsHistoricalData;
 
 namespace MonitorGlass.Web.Endpoints;
 
@@ -37,6 +38,14 @@ public class Windows : EndpointGroupBase
         .Produces<WindowsDto>()
         .Produces<ProblemDetails>(StatusCodes.Status404NotFound)
         .WithOpenApi();
+
+        groupBuilder.MapGet(GetHistoricalWindowsMetrics, nameof(GetHistoricalWindowsMetrics).ToLower())
+        .RequireAuthorization()
+        .WithSummary("Windows Metrics Historical data")
+        .WithDescription("Get the paginated windows hsitorical data with datetime range.")
+        .Produces<PaginatedList<WindowsMetricDto>>()
+        .Produces<ProblemDetails>(StatusCodes.Status404NotFound)
+        .WithOpenApi();
     }
 
     async Task<Results<Ok<Result>, BadRequest>> AddServer(ISender sender, AddServerCommand command)
@@ -61,5 +70,13 @@ public class Windows : EndpointGroupBase
         return response is null
         ? TypedResults.NotFound()
         : TypedResults.Ok(response);
+    }
+
+    async Task<Results<Ok<PaginatedList<WindowsMetricDto>>, NotFound>> GetHistoricalWindowsMetrics(ISender sender, int pageNumber, int pageSize, DateTimeOffset from, DateTimeOffset to)
+    {
+        var response = await sender.Send(new WindowsHistoricalDataQuery { PageNumber = pageNumber, PageSize = pageSize, From = from, To = to });
+        return response.Items.Count > 0
+        ? TypedResults.Ok(response)
+        : TypedResults.NotFound();
     }
 }

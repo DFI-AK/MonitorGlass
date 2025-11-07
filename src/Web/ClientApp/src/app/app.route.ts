@@ -1,5 +1,7 @@
 import { Routes } from '@angular/router';
 import { userResolver } from './core/utils/routeResolver';
+import { appGuard } from './core/guards/app.guard';
+import { identityGuard } from './core/guards/identity.guard';
 
 export const routes: Routes = [
   {
@@ -8,6 +10,7 @@ export const routes: Routes = [
     pathMatch: 'full',
   },
   {
+    canActivate: [appGuard],
     path: 'app',
     resolve: {
       currentUser: userResolver,
@@ -26,6 +29,7 @@ export const routes: Routes = [
     ],
   },
   {
+    canActivate: [identityGuard],
     path: 'identity',
     children: [
       {

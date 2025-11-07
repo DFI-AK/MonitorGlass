@@ -43,6 +43,7 @@ bootstrapApplication(AppComponent, {
       theme: {
         preset: Aura,
       },
+      ripple: true,
     }),
     MessageService,
   ],

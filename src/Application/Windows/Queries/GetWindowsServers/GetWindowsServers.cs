@@ -10,7 +10,7 @@ internal sealed class GetWindowsServersQueryHandler(IWindowsRepository repositor
 
     public async Task<WindowsDto> Handle(GetWindowsServersQuery request, CancellationToken cancellationToken)
     {
-        var servers = await _repository.GetWindowsServerAsync(cancellationToken) ?? throw new KeyNotFoundException("No server is added yet.");
+        var servers = await _repository.GetWindowsServerAsync(cancellationToken);
         return _mapper.Map<WindowsDto>(servers);
     }
 }

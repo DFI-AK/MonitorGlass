@@ -105,7 +105,6 @@ export class UserService {
         return of(currentUser);
       }),
       tap((user) => this._user.set(user)),
-      catchError((error) => this._errorService.handleHttpError(error)),
       catchError((error) => this._errorService.handleUnauthorizeError(error))
     );
 }

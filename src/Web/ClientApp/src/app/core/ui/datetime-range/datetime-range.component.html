@@ -21,4 +21,16 @@
     size="small"
   />
   }
+  <p-button
+    icon="pi pi-refresh"
+    size="small"
+    severity="secondary"
+    [rounded]="true"
+    [pTooltip]="refreshTooltip"
+    tooltipPosition="right"
+  />
+
+  <ng-template #refreshTooltip>
+    <span class="text-sm">Refresh</span>
+  </ng-template>
 </div>

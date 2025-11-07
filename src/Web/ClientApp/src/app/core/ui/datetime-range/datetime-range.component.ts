@@ -3,6 +3,8 @@ import { FormsModule } from '@angular/forms';
 import { DatePicker } from 'primeng/datepicker';
 import { FloatLabel } from 'primeng/floatlabel';
 import { SelectModule } from 'primeng/select';
+import { Button } from 'primeng/button';
+import { Tooltip } from 'primeng/tooltip';
 
 export type RangeSeletor = Partial<{
   label: string;
@@ -12,7 +14,7 @@ export type RangeSeletor = Partial<{
 
 @Component({
   selector: 'monitorglass-datetime-range',
-  imports: [FormsModule, DatePicker, FloatLabel, SelectModule],
+  imports: [FormsModule, DatePicker, FloatLabel, SelectModule, Button, Tooltip],
   templateUrl: './datetime-range.component.html',
   styleUrl: './datetime-range.component.css',
 })

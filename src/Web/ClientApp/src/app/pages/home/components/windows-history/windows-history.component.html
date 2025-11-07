@@ -1,1 +1,82 @@
-<p>windows-history works!</p>
+<p-table
+  [columns]="cpu_n_memory_columns"
+  [value]="metrics()"
+  [virtualScroll]="true"
+  [rows]="pagination().pageSize"
+  [totalRecords]="metricTotalRecord() || 0"
+  [rowsPerPageOptions]="[10, 20, 50, 75, 100]"
+  [scrollable]="true"
+  [scrollHeight]="'320px'"
+  [lazy]="true"
+  (onLazyLoad)="changePagination($event)"
+  [showCurrentPageReport]="true"
+  currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+  [loading]="isLoading()"
+  showGridlines
+  size="small"
+  dataKey="id"
+>
+  <ng-template #header>
+    <tr>
+      @for (header of cpu_n_memory_columns; track header.key) {
+      <th>{{ header.field }}</th>
+      }
+    </tr>
+  </ng-template>
+  <ng-template #body let-metric>
+    <tr>
+      <td>{{ metric.serverId }}</td>
+      <td>
+        {{ ((metric.cpu.coreUsage / metric.cpu.cores) * 100).toFixed(2) }} %
+      </td>
+      <td>
+        {{
+          (
+            (metric.memory.usedMemoryMB / metric.memory.totalMemoryMB) *
+            100
+          ).toFixed(2)
+        }}
+        %
+      </td>
+      <td>
+        <div class="flex items-center gap-x-2 w-full">
+          <button
+            type="button"
+            pButton
+            severity="contrast"
+            text
+            size="small"
+            outlined
+            class="p-1!"
+          >
+            <span class="material-symbols-outlined"> hard_drive </span>
+          </button>
+
+          <button
+            type="button"
+            pButton
+            severity="contrast"
+            size="small"
+            outlined
+            class="p-1!"
+          >
+            <span class="material-symbols-outlined"> network_check </span>
+          </button>
+        </div>
+      </td>
+      <td>{{ metric.created | date : "medium" }}</td>
+    </tr>
+  </ng-template>
+  <ng-template #loadingbody let-columns="columns">
+    <tr class="h-12">
+      @for (item of columns; track $index;) {
+      <p-skeleton
+        [ngStyle]="{
+          width: $index % 2 === 0 ? (item.key === 'cpu' ? '30%' : '40%') : '60%'
+        }"
+        ]
+      />
+      }
+    </tr>
+  </ng-template>
+</p-table>
