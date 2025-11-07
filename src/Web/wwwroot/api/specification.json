@@ -624,12 +624,6 @@
         },
         "responses": {
           "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {}
-            }
-          },
-          "201": {
             "description": "",
             "content": {
               "application/json": {

@@ -24,6 +24,7 @@ else
 app.UseHealthChecks("/health");
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+app.UseCors("AllowedOrigins");
 
 app.UseSwaggerUi(settings =>
 {

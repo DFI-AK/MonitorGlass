@@ -9,13 +9,19 @@
     />
   </div>
   }@else if (windows()) {
-  <div class="grid sm:grid-cols-4">
+  <monitorglass-datetime-range (rangeEvent)="rangeSelection($event)" />
+  @if (!rangeSelector?.enableRange && !rangeSelector?.value) {
+  <div class="grid sm:grid-cols-3">
     <monitorglass-server-card
       [server]="windows()"
+      [metric]="metric()"
       (onDelete)="deleteServer($event)"
     />
   </div>
-  } @else {
+
+  }@else {
+  <monitorglass-windows-history />
+  } } @else {
   <span class="text-sm text-slate-400"
     >No servers are added yet, &nbsp;
     <button

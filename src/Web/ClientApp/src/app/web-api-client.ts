@@ -899,9 +899,8 @@ export class UserClient implements IUserClient {
 export interface IWindowsClient {
     /**
      * Add new server
-     * @return OK
      */
-    addServer(command: AddServerCommand): Observable<void>;
+    addServer(command: AddServerCommand): Observable<Result>;
     /**
      * Delete server
      */
@@ -927,9 +926,8 @@ export class WindowsClient implements IWindowsClient {
 
     /**
      * Add new server
-     * @return OK
      */
-    addServer(command: AddServerCommand): Observable<void> {
+    addServer(command: AddServerCommand): Observable<Result> {
         let url_ = this.baseUrl + "/api/Windows/addserver";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -952,14 +950,14 @@ export class WindowsClient implements IWindowsClient {
                 try {
                     return this.processAddServer(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<void>;
+                    return _observableThrow(e) as any as Observable<Result>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<void>;
+                return _observableThrow(response_) as any as Observable<Result>;
         }));
     }
 
-    protected processAddServer(response: HttpResponseBase): Observable<void> {
+    protected processAddServer(response: HttpResponseBase): Observable<Result> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -968,14 +966,10 @@ export class WindowsClient implements IWindowsClient {
         let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
         if (status === 200) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return _observableOf(null as any);
-            }));
-        } else if (status === 201) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            let result201: any = null;
-            let resultData201 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result201 = Result.fromJS(resultData201);
-            return throwException("A server side error occurred.", status, _responseText, _headers, result201);
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = Result.fromJS(resultData200);
+            return _observableOf(result200);
             }));
         } else if (status === 400) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
